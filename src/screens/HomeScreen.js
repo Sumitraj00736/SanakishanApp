@@ -1,5 +1,5 @@
 // src/screens/HomeScreen.js
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   View,
   Text,
@@ -17,26 +17,41 @@ import SearchBar from "../components/homeScreen/SearchBar";
 import Category from "../components/homeScreen/Category";
 import ProductGrid from "../components/homeScreen/ProductList";
 import BottomBar from "../components/navigation/BottomBar";
+import { AuthContext } from "../context/AuthProvider";
+
 
 export default function HomeScreen() {
   const [search, setSearch] = useState("");
   const [memberModalVisible, setMemberModalVisible] = useState(false);
   const [memberId, setMemberId] = useState("");
 
-  const handleMemberSave = () => {
+  const { login } = useContext(AuthContext);           
+
+  const handleMemberSave = async () => {
     if (!memberId) {
       alert("Please enter Member ID");
       return;
     }
-    console.log("Member ID:", memberId);
-    setMemberModalVisible(false);
+
+    // Call API login
+    const res = await login(memberId);
+
+    if (res.success) {
+      alert("Login successful!");
+      setMemberModalVisible(false);  // Close modal
+    } else {
+      alert(res.message || "Login failed");
+    }
   };
 
   return (
     <View style={styles.container}>
       {/* Top Section */}
       <View style={styles.topSection}>
-        <Heading onMemberPress={() => setMemberModalVisible(true)} hasMemberId={!!memberId} />
+        <Heading 
+          onMemberPress={() => setMemberModalVisible(true)}
+          hasMemberId={!!memberId}
+        />
         <Slider />
         <SearchBar search={search} setSearch={setSearch} />
         <Category />
@@ -78,6 +93,7 @@ export default function HomeScreen() {
           </View>
         </KeyboardAvoidingView>
       </Modal>
+
       <BottomBar />
     </View>
   );
@@ -86,15 +102,47 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff" },
   topSection: { backgroundColor: "green", padding: 16, paddingBottom: 24 },
-  productsLabel: { fontSize: 18, fontWeight: "bold", color: "black", marginLeft: 16, marginTop: 16 },
+  productsLabel: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "black",
+    marginLeft: 16,
+    marginTop: 16,
+  },
 
-  modalOverlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "center", alignItems: "center" },
-  modalContainer: { width: "80%", backgroundColor: "white", borderRadius: 10, padding: 16 },
-  modalHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 16 },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContainer: {
+    width: "80%",
+    backgroundColor: "white",
+    borderRadius: 10,
+    padding: 16,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+  },
   modalTitle: { fontSize: 18, fontWeight: "bold" },
   closeButton: { fontSize: 18, fontWeight: "bold", color: "red" },
-  memberInput: { borderWidth: 1, borderColor: "#ccc", borderRadius: 8, paddingHorizontal: 12, paddingVertical: 8, marginBottom: 16 },
-
-  saveButton: { backgroundColor: "green", paddingVertical: 12, borderRadius: 8, alignItems: "center" },
+  memberInput: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginBottom: 16,
+  },
+  saveButton: {
+    backgroundColor: "green",
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: "center",
+  },
   saveButtonText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
 });

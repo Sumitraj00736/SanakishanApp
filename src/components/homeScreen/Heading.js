@@ -1,14 +1,17 @@
 // src/components/homeScreen/Heading.js
-import React from "react";
+import React, { useContext } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { MaterialIcons } from '@expo/vector-icons'; // make sure expo/vector-icons is installed
+import { AuthContext } from "../../context/AuthProvider";
 
-export default function Heading({ onMemberPress, hasMemberId }) {
+export default function Heading({ onMemberPress }) {
+    const { user } = useContext(AuthContext);
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>SanaKisan Equipment</Text>
       <TouchableOpacity style={styles.memberButton} onPress={onMemberPress}>
-        {hasMemberId ? (
+        {user ? (
           <MaterialIcons name="check" size={20} color="white" />
         ) : (
           <Text style={{ color: "white", fontWeight: "bold" }}>+</Text>

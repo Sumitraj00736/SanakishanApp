@@ -1,5 +1,4 @@
-// src/components/product/BookingForm.js
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useContext } from "react";
 import {
   View,
   Text,
@@ -7,21 +6,25 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
-  Platform,
   Animated,
 } from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { ProductContext } from "../../context/ProductProvider";
+import { AuthContext } from "../../context/AuthProvider";
 
-export default function BookingForm({ product }) {
-  const [name, setName] = useState("");
-  const [number, setNumber] = useState("");
-  const [address, setAddress] = useState("");
-  const [membershipId, setMembershipId] = useState("");
-  const [nagritaNumber, setNagritaNumber] = useState("");
-  const [date, setDate] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
+export default function BookingForm() {
+  const { productDetail, bookProduct } = useContext(ProductContext);
+  const { user } = useContext(AuthContext);
 
-  // Animation
+  const [name, setName] = useState(user?.name || "");
+  const [phone, setPhone] = useState(user?.phone || "");
+  const [email, setEmail] = useState(user?.email || "");
+  const [quantity, setQuantity] = useState("1");
+  const [startDateTime, setStartDateTime] = useState(new Date());
+  const [endDateTime, setEndDateTime] = useState(new Date());
+  const [showStartPicker, setShowStartPicker] = useState(false);
+  const [showEndPicker, setShowEndPicker] = useState(false);
+
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -32,22 +35,40 @@ export default function BookingForm({ product }) {
     }).start();
   }, []);
 
-  const handleBooking = () => {
-    if (!name || !number || !address || !membershipId || !nagritaNumber) {
-      Alert.alert("Error", "Please fill all fields");
+  const handleBooking = async () => {
+    if (!name || !phone || !email || !quantity) {
+      Alert.alert("Error", "Please fill all required fields");
       return;
     }
-    Alert.alert(
-      "Booking Confirmed",
-      `Product: ${product.name}\nName: ${name}\nDate: ${date.toLocaleString()}`
-    );
 
-    // Reset form
-    setName("");
-    setNumber("");
-    setAddress("");
-    setMembershipId("");
-    setNagritaNumber("");
+    if (!productDetail) {
+      Alert.alert("Error", "Product details not loaded yet");
+      return;
+    }
+
+    const bookingData = {
+      productId: productDetail._id,
+      quantity: Number(quantity),
+      startDateTime: startDateTime.toISOString(),
+      endDateTime: endDateTime.toISOString(),
+      userName: name,
+      userPhone: phone,
+      userEmail: email,
+    };
+
+    const res = await bookProduct(bookingData);
+
+    if (res.success) {
+      Alert.alert(
+        "Booking Confirmed",
+        `Product: ${productDetail.name}\nName: ${name}\nQuantity: ${quantity}\nStart: ${startDateTime.toLocaleString()}\nEnd: ${endDateTime.toLocaleString()}`
+      );
+      setQuantity("1");
+      setStartDateTime(new Date());
+      setEndDateTime(new Date());
+    } else {
+      Alert.alert("Booking Failed", res.message);
+    }
   };
 
   return (
@@ -63,55 +84,67 @@ export default function BookingForm({ product }) {
       <Text style={styles.formLabel}>Phone Number</Text>
       <TextInput
         style={styles.input}
-        value={number}
-        onChangeText={setNumber}
+        value={phone}
+        onChangeText={setPhone}
         placeholder="Enter your phone number"
         keyboardType="phone-pad"
       />
 
-      <Text style={styles.formLabel}>Address</Text>
+      <Text style={styles.formLabel}>Email</Text>
       <TextInput
         style={styles.input}
-        value={address}
-        onChangeText={setAddress}
-        placeholder="Enter your address"
+        value={email}
+        onChangeText={setEmail}
+        placeholder="Enter your email"
+        keyboardType="email-address"
       />
 
-      <Text style={styles.formLabel}>Membership ID</Text>
+      <Text style={styles.formLabel}>Quantity</Text>
       <TextInput
         style={styles.input}
-        value={membershipId}
-        onChangeText={setMembershipId}
-        placeholder="Enter your membership ID"
+        value={quantity}
+        onChangeText={setQuantity}
+        placeholder="Enter quantity"
+        keyboardType="numeric"
       />
 
-      <Text style={styles.formLabel}>Nagrita Number</Text>
-      <TextInput
-        style={styles.input}
-        value={nagritaNumber}
-        onChangeText={setNagritaNumber}
-        placeholder="Enter Nagrita Number"
-      />
-
-      <Text style={styles.formLabel}>Select Date & Time</Text>
+      {/* Start Date */}
+      <Text style={styles.formLabel}>Start Date & Time</Text>
       <TouchableOpacity
         style={styles.dateButton}
-        onPress={() => setShowDatePicker(true)}
+        onPress={() => setShowStartPicker(true)}
       >
-        <Text>{date.toLocaleString()}</Text>
+        <Text>{startDateTime.toLocaleString()}</Text>
       </TouchableOpacity>
+      <DateTimePickerModal
+        isVisible={showStartPicker}
+        mode="datetime"
+        date={startDateTime}
+        onConfirm={(date) => {
+          setStartDateTime(date);
+          setShowStartPicker(false);
+        }}
+        onCancel={() => setShowStartPicker(false)}
+      />
 
-      {showDatePicker && (
-        <DateTimePicker
-          value={date}
-          mode="datetime"
-          display="default"
-          onChange={(event, selectedDate) => {
-            if (Platform.OS === "android") setShowDatePicker(false);
-            if (selectedDate) setDate(selectedDate);
-          }}
-        />
-      )}
+      {/* End Date */}
+      <Text style={styles.formLabel}>End Date & Time</Text>
+      <TouchableOpacity
+        style={styles.dateButton}
+        onPress={() => setShowEndPicker(true)}
+      >
+        <Text>{endDateTime.toLocaleString()}</Text>
+      </TouchableOpacity>
+      <DateTimePickerModal
+        isVisible={showEndPicker}
+        mode="datetime"
+        date={endDateTime}
+        onConfirm={(date) => {
+          setEndDateTime(date);
+          setShowEndPicker(false);
+        }}
+        onCancel={() => setShowEndPicker(false)}
+      />
 
       <TouchableOpacity style={styles.bookButton} onPress={handleBooking}>
         <Text style={styles.bookButtonText}>Book Now</Text>
@@ -123,7 +156,7 @@ export default function BookingForm({ product }) {
 const styles = StyleSheet.create({
   formContainer: {
     marginTop: 16,
-    backgroundColor: "rgba(144, 238, 144, 0.2)", // light green with low opacity
+    backgroundColor: "rgba(144, 238, 144, 0.2)",
     padding: 16,
     borderRadius: 12,
     margin: 16,
@@ -136,7 +169,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     marginBottom: 12,
-    backgroundColor: "#f9fff9", // subtle white-green background
+    backgroundColor: "#f9fff9",
   },
   dateButton: {
     borderWidth: 1,
@@ -144,7 +177,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     marginBottom: 16,
-    backgroundColor: "#e0ffe0", // light green
+    backgroundColor: "#e0ffe0",
   },
   bookButton: {
     backgroundColor: "green",
