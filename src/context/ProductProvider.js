@@ -1,6 +1,8 @@
 import React, { createContext, useState, useCallback, useMemo } from "react";
 
 export const ProductContext = createContext();
+import { AuthContext } from "./AuthProvider";
+
 
 const BASE_URL = "https://shanakishan-backend.onrender.com/api/products";
 const BOOKING_URL = "https://shanakishan-backend.onrender.com/api/bookings";
@@ -10,6 +12,7 @@ export const ProductProvider = ({ children }) => {
   const [productDetail, setProductDetail] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const { token } = React.useContext(AuthContext);
 
   // --------------------------
   // Fetch ALL products
@@ -52,13 +55,21 @@ export const ProductProvider = ({ children }) => {
   // --------------------------
   // BOOK PRODUCT
   // --------------------------
-  const bookProduct = useCallback(async (bookingData) => {
+  const bookProduct = useCallback(
+  async (bookingData) => {
     try {
+      const headers = {
+        "Content-Type": "application/json",
+      };
+
+      if (token) {
+        console.log("Adding Authorization header with token:", token);
+        headers.Authorization = `Bearer ${token}`;
+      }
+
       const res = await fetch(BOOKING_URL, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers,
         body: JSON.stringify(bookingData),
       });
 
@@ -70,9 +81,13 @@ export const ProductProvider = ({ children }) => {
 
       return { success: true, data };
     } catch (err) {
+      console.error("Booking error:", err);
       return { success: false, message: "Something went wrong" };
     }
-  }, []);
+  },
+  [token]
+);
+
 
   // --------------------------
   // Memoized Context Value
@@ -85,7 +100,7 @@ export const ProductProvider = ({ children }) => {
       error,
       fetchProducts,
       fetchProductById,
-      bookProduct,        // <-- ADDED SAFELY
+      bookProduct,       
     }),
     [
       products,

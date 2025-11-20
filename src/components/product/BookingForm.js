@@ -12,9 +12,11 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { ProductContext } from "../../context/ProductProvider";
 import { AuthContext } from "../../context/AuthProvider";
 
+
 export default function BookingForm() {
   const { productDetail, bookProduct } = useContext(ProductContext);
   const { user } = useContext(AuthContext);
+  
 
   const [name, setName] = useState(user?.name || "");
   const [phone, setPhone] = useState(user?.phone || "");

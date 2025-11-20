@@ -9,7 +9,6 @@ import {
   Dimensions,
 } from "react-native";
 import { useRoute } from "@react-navigation/native";
-// import BookingForm from "./BookingForm";
 import { ProductContext } from "../../context/ProductProvider";
 import { AuthContext } from "../../context/AuthProvider";
 

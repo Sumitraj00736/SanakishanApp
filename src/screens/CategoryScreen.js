@@ -1,24 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { View, Text, FlatList, StyleSheet } from "react-native";
 import BottomBar from "../components/navigation/BottomBar";
 import Heading from "../components/homeScreen/Heading";
 import SearchBar from "../components/homeScreen/SearchBar";
-
-const categories = [
-  "Electronics",
-  "Furniture",
-  "Clothing",
-  "Books",
-  "Appliances",
-  "Agriculture",
-  "Construction",
-  "Medical Equipment",
-  "Sports Gear",
-  "Beauty Products",
-];
+import { ProductContext } from "../context/ProductProvider";
 
 export default function CategoriesScreen() {
+  const { products, fetchProducts } = useContext(ProductContext);
   const [search, setSearch] = useState("");
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  useEffect(() => {
+    // Extract unique categories from products
+    const uniqueCategories = [
+      ...new Set(products.map((p) => p.category).filter(Boolean)),
+    ];
+    setCategories(uniqueCategories);
+  }, [products]);
 
   // Filter categories based on search text
   const filteredCategories = categories.filter((item) =>
@@ -38,7 +40,7 @@ export default function CategoriesScreen() {
         data={filteredCategories}
         keyExtractor={(item) => item}
         renderItem={({ item }) => <Text style={styles.item}>{item}</Text>}
-        contentContainerStyle={{ paddingBottom: 80 }}
+        contentContainerStyle={{ paddingBottom: 100 }}
         ListEmptyComponent={
           <Text style={styles.noResult}>No categories found</Text>
         }

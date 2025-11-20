@@ -3,19 +3,20 @@ import { View, Text, FlatList, StyleSheet } from "react-native";
 import Heading from "../components/homeScreen/Heading";
 import SearchBar from "../components/homeScreen/SearchBar";
 import BottomBar from "../components/navigation/BottomBar";
+import ProductGrid from "../components/homeScreen/ProductList"
 
 // Sample product list (you can later replace this with real data)
 const products = [
-  { id: 1, name: "Tractor" },
-  { id: 2, name: "Plough" },
-  { id: 3, name: "Harvester" },
-  { id: 4, name: "Water Pump" },
-  { id: 5, name: "Fertilizer Mixer" },
-  { id: 6, name: "Seed Drill Machine" },
-  { id: 7, name: "Sprayer" },
-  { id: 8, name: "Irrigation Motor" },
-  { id: 9, name: "Mini Tractor" },
-  { id: 10, name: "Rotavator" },
+  // { id: 1, name: "Tractor" },
+  // { id: 2, name: "Plough" },
+  // { id: 3, name: "Harvester" },
+  // { id: 4, name: "Water Pump" },
+  // { id: 5, name: "Fertilizer Mixer" },
+  // { id: 6, name: "Seed Drill Machine" },
+  // { id: 7, name: "Sprayer" },
+  // { id: 8, name: "Irrigation Motor" },
+  // { id: 9, name: "Mini Tractor" },
+  // { id: 10, name: "Rotavator" },
 ];
 
 export default function SearchScreen() {
@@ -35,15 +36,7 @@ export default function SearchScreen() {
       </View>
 
       {/* Product List */}
-      <FlatList
-        data={filteredProducts}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => <Text style={styles.item}>{item.name}</Text>}
-        ListEmptyComponent={
-          <Text style={styles.noResult}>No products found</Text>
-        }
-        contentContainerStyle={{ paddingBottom: 80 }}
-      />
+      <ProductGrid search={search} />
 
       {/* Bottom Navigation Bar */}
       <BottomBar />

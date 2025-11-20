@@ -3,7 +3,7 @@ import { ScrollView, StyleSheet, Dimensions, View } from "react-native";
 import { Video } from "expo-av";
 
 const { width } = Dimensions.get("window");
-const videoHeight = (width - 32) * 9 / 16; // 16:9 ratio
+const videoHeight = (width - 32) * 9 / 16;
 
 export default function Slider() {
   const banners = [
