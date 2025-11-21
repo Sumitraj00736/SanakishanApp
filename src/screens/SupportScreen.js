@@ -1,24 +1,84 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert } from "react-native";
+import React, { useState, useContext } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
+
 import BottomBar from "../components/navigation/BottomBar";
+import { ProductContext } from "../context/ProductProvider";
 
 export default function SupportScreen() {
+  const { createSupportTicket } = useContext(ProductContext);
+
   const [form, setForm] = useState({
+    bookingId: "",
     name: "",
-    number: "",
-    memberId: "",
-    description: "",
+    phone: "",
+    email: "",
+    message: "",
   });
 
-  const handleChange = (key, value) => setForm({ ...form, [key]: value });
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = () => {
-    if (!form.name || !form.number || !form.memberId || !form.description) {
-      Alert.alert("Error", "Please fill in all fields");
+  const handleChange = (key, value) => {
+    setForm({ ...form, [key]: value });
+  };
+
+  const handleSubmit = async () => {
+    const { bookingId, name, phone, email, message } = form;
+
+    // ✅ Validation
+    if (!bookingId || !name || !phone || !email || !message) {
+      Alert.alert("Error", "All fields are required");
       return;
     }
-    Alert.alert("Success", "Your support request has been submitted!");
-    setForm({ name: "", number: "", memberId: "", description: "" });
+
+    if (phone.length < 10) {
+      Alert.alert("Error", "Enter a valid phone number");
+      return;
+    }
+
+    if (!email.includes("@")) {
+      Alert.alert("Error", "Enter a valid email");
+      return;
+    }
+
+    setLoading(true);
+
+    const payload = {
+      bookingId,
+      name,
+      phone,
+      email,
+      adminMessage: "",
+      message,
+    };
+
+    const response = await createSupportTicket(payload);
+
+    setLoading(false);
+
+    if (!response.success) {
+      Alert.alert("Error", response.message);
+      return;
+    }
+
+    Alert.alert("Success", "Support ticket created successfully ✅");
+
+    // ✅ Clear form
+    setForm({
+      bookingId: "",
+      name: "",
+      phone: "",
+      email: "",
+      message: "",
+    });
   };
 
   return (
@@ -35,6 +95,14 @@ export default function SupportScreen() {
       <View style={styles.form}>
         <TextInput
           style={styles.input}
+          placeholder="Booking ID"
+          placeholderTextColor="#888"
+          value={form.bookingId}
+          onChangeText={(text) => handleChange("bookingId", text)}
+        />
+
+        <TextInput
+          style={styles.input}
           placeholder="Full Name"
           placeholderTextColor="#888"
           value={form.name}
@@ -46,16 +114,18 @@ export default function SupportScreen() {
           placeholder="Phone Number"
           placeholderTextColor="#888"
           keyboardType="phone-pad"
-          value={form.number}
-          onChangeText={(text) => handleChange("number", text)}
+          value={form.phone}
+          onChangeText={(text) => handleChange("phone", text)}
         />
 
         <TextInput
           style={styles.input}
-          placeholder="Member ID"
+          placeholder="Email Address"
           placeholderTextColor="#888"
-          value={form.memberId}
-          onChangeText={(text) => handleChange("memberId", text)}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          value={form.email}
+          onChangeText={(text) => handleChange("email", text)}
         />
 
         <TextInput
@@ -64,16 +134,24 @@ export default function SupportScreen() {
           placeholderTextColor="#888"
           multiline
           numberOfLines={4}
-          value={form.description}
-          onChangeText={(text) => handleChange("description", text)}
+          value={form.message}
+          onChangeText={(text) => handleChange("message", text)}
         />
 
-        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-          <Text style={styles.buttonText}>Submit Request</Text>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleSubmit}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.buttonText}>Submit Request</Text>
+          )}
         </TouchableOpacity>
       </View>
-      <BottomBar/>
 
+      <BottomBar />
     </ScrollView>
   );
 }

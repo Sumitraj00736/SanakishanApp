@@ -6,6 +6,8 @@ import { AuthContext } from "./AuthProvider";
 
 const BASE_URL = "https://shanakishan-backend.onrender.com/api/products";
 const BOOKING_URL = "https://shanakishan-backend.onrender.com/api/bookings";
+const SUPPORT_URL = "https://shanakishan-backend.onrender.com/api/support";
+
 
 export const ProductProvider = ({ children }) => {
   const [products, setProducts] = useState([]);
@@ -88,6 +90,36 @@ export const ProductProvider = ({ children }) => {
   [token]
 );
 
+// --------------------------
+// CREATE SUPPORT TICKET (PUBLIC - NO TOKEN)
+// --------------------------
+const createSupportTicket = useCallback(async (supportData) => {
+  try {
+    const res = await fetch(SUPPORT_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(supportData),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      return {
+        success: false,
+        message: data.message || "Support request failed",
+      };
+    }
+
+    return { success: true, data };
+  } catch (err) {
+    console.error("Support error:", err);
+    return { success: false, message: "Something went wrong" };
+  }
+}, []);
+
+
 
   // --------------------------
   // Memoized Context Value
@@ -100,7 +132,8 @@ export const ProductProvider = ({ children }) => {
       error,
       fetchProducts,
       fetchProductById,
-      bookProduct,       
+      bookProduct,   
+      createSupportTicket,     
     }),
     [
       products,
@@ -110,6 +143,7 @@ export const ProductProvider = ({ children }) => {
       fetchProducts,
       fetchProductById,
       bookProduct,
+      createSupportTicket, 
     ]
   );
 
