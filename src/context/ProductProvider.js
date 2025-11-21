@@ -93,13 +93,23 @@ export const ProductProvider = ({ children }) => {
 // --------------------------
 // CREATE SUPPORT TICKET (PUBLIC - NO TOKEN)
 // --------------------------
+// --------------------------
+// CREATE SUPPORT TICKET (OPTIONAL AUTH)
+// --------------------------
 const createSupportTicket = useCallback(async (supportData) => {
   try {
+    const headers = {
+      "Content-Type": "application/json",
+    };
+
+    // ✅ Only add token if user is logged in
+    if (token && token !== "null" && token !== "undefined") {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
     const res = await fetch(SUPPORT_URL, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify(supportData),
     });
 
@@ -108,7 +118,7 @@ const createSupportTicket = useCallback(async (supportData) => {
     if (!res.ok) {
       return {
         success: false,
-        message: data.message || "Support request failed",
+        message: data?.message || "Support request failed",
       };
     }
 
@@ -117,7 +127,8 @@ const createSupportTicket = useCallback(async (supportData) => {
     console.error("Support error:", err);
     return { success: false, message: "Something went wrong" };
   }
-}, []);
+}, [token]);
+
 
 
 
