@@ -7,10 +7,13 @@ import { AuthContext } from "./AuthProvider";
 const BASE_URL = "https://shanakishan-backend.onrender.com/api/products";
 const BOOKING_URL = "https://shanakishan-backend.onrender.com/api/bookings";
 const SUPPORT_URL = "https://shanakishan-backend.onrender.com/api/support";
+const CATEGORY_URL = "https://shanakishan-backend.onrender.com/api/categories";
+
 
 
 export const ProductProvider = ({ children }) => {
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [productDetail, setProductDetail] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -129,6 +132,42 @@ const createSupportTicket = useCallback(async (supportData) => {
   }
 }, [token]);
 
+const fetchProductsByCategory = useCallback(async (categoryId) => {
+  try {
+    setLoading(true);
+    setError("");
+
+    const res = await fetch(
+      `https://shanakishan-backend.onrender.com/api/categories/${categoryId}/products`
+    );
+
+    const data = await res.json();
+    setProducts(data);
+  } catch (err) {
+    setError("Failed to load category products");
+  } finally {
+    setLoading(false);
+  }
+}, []);
+
+
+const fetchCategories = useCallback(async () => {
+  try {
+    setLoading(true);
+    setError("");
+
+    const res = await fetch(CATEGORY_URL);
+    const data = await res.json();
+
+    setCategories(data);
+  } catch (err) {
+    setError("Failed to load categories");
+  } finally {
+    setLoading(false);
+  }
+}, []);
+
+
 
 
 
@@ -136,27 +175,34 @@ const createSupportTicket = useCallback(async (supportData) => {
   // Memoized Context Value
   // --------------------------
   const value = useMemo(
-    () => ({
-      products,
-      productDetail,
-      loading,
-      error,
-      fetchProducts,
-      fetchProductById,
-      bookProduct,   
-      createSupportTicket,     
-    }),
-    [
-      products,
-      productDetail,
-      loading,
-      error,
-      fetchProducts,
-      fetchProductById,
-      bookProduct,
-      createSupportTicket, 
-    ]
-  );
+  () => ({
+    products,
+    categories,  // 
+    productDetail,
+    loading,
+    error,
+    fetchProducts,
+    fetchCategories, // 
+    fetchProductsByCategory, 
+    fetchProductById,
+    bookProduct,
+    createSupportTicket,
+  }),
+  [
+    products,
+    categories,
+    productDetail,
+    loading,
+    error,
+    fetchProducts,
+    fetchCategories,
+    fetchProductsByCategory,
+    fetchProductById,
+    bookProduct,
+    createSupportTicket,
+  ]
+);
+
 
   return (
     <ProductContext.Provider value={value}>
