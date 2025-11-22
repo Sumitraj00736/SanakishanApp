@@ -38,7 +38,7 @@ export default function BookingForm() {
   }, []);
 
   const handleBooking = async () => {
-    if (!name || !phone || !email || !quantity) {
+    if (!name || !phone || !quantity) {
       Alert.alert("Error", "Please fill all required fields");
       return;
     }
