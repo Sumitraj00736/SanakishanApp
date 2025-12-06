@@ -3,7 +3,7 @@ import { View, Text, FlatList, StyleSheet } from "react-native";
 import Heading from "../components/homeScreen/Heading";
 import SearchBar from "../components/homeScreen/SearchBar";
 import BottomBar from "../components/navigation/BottomBar";
-import ProductGrid from "../components/homeScreen/ProductList"
+import ProductList from "../components/homeScreen/ProductList"
 
 // Sample product list (you can later replace this with real data)
 const products = [
@@ -36,7 +36,7 @@ export default function SearchScreen() {
       </View>
 
       {/* Product List */}
-      <ProductGrid search={search} />
+      <ProductList search={search} />
 
       {/* Bottom Navigation Bar */}
       <BottomBar />

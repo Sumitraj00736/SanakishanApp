@@ -45,6 +45,7 @@ const styles = StyleSheet.create({
         height: 50,
         resizeMode: "contain",
         marginRight: 10,
+        borderRadius: 10,
       
     },
     title: { 

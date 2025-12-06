@@ -17,7 +17,6 @@ export default function SupportScreen() {
   const { createSupportTicket } = useContext(ProductContext);
 
   const [form, setForm] = useState({
-    bookingId: "",
     name: "",
     phone: "",
     email: "",
@@ -31,28 +30,32 @@ export default function SupportScreen() {
   };
 
   const handleSubmit = async () => {
-    const { bookingId, name, phone, email, message } = form;
+    const {name, phone, email, message } = form;
 
     // ✅ Validation
-    if (!bookingId || !name || !phone || !email || !message) {
-      Alert.alert("Error", "All fields are required");
+   switch (true) {
+    case !name:
+      Alert.alert("Error", "Name field is required");
       return;
-    }
-
-    if (phone.length < 10) {
+    case !phone:
+      Alert.alert("Error", "Phone field is required");
+      return;
+    case phone.length < 10:
       Alert.alert("Error", "Enter a valid phone number");
       return;
-    }
+    default:
+      break;
+   }
+  //  (!name ) {
+  //     Alert.alert("Error", "All fields are required");
+  //     return;
+  //   }
 
-    if (!email.includes("@")) {
-      Alert.alert("Error", "Enter a valid email");
-      return;
-    }
 
     setLoading(true);
 
     const payload = {
-      bookingId,
+      // bookingId,
       name,
       phone,
       email,
@@ -73,7 +76,7 @@ export default function SupportScreen() {
 
     // ✅ Clear form
     setForm({
-      bookingId: "",
+      // bookingId: "",
       name: "",
       phone: "",
       email: "",
@@ -93,13 +96,13 @@ export default function SupportScreen() {
 
       {/* Form Section */}
       <View style={styles.form}>
-        <TextInput
+        {/* <TextInput
           style={styles.input}
           placeholder="Booking ID"
           placeholderTextColor="#888"
           value={form.bookingId}
           onChangeText={(text) => handleChange("bookingId", text)}
-        />
+        /> */}
 
         <TextInput
           style={styles.input}

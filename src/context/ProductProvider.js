@@ -111,10 +111,12 @@ const createSupportTicket = useCallback(async (supportData) => {
       "Content-Type": "application/json",
     };
 
+
     // ✅ Only add token if user is logged in
     if (token && token !== "null" && token !== "undefined") {
       headers.Authorization = `Bearer ${token}`;
     }
+
 
     const res = await fetch(SUPPORT_URL, {
       method: "POST",
