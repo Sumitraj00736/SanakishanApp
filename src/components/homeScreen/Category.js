@@ -1,5 +1,5 @@
 // src/components/homeScreen/Category.js
-import React, { useEffect, useContext, useCallback } from "react";
+import React, { useEffect, useContext, useCallback, useState } from "react";
 import {
   ScrollView,
   View,
@@ -18,15 +18,26 @@ export default function Category() {
     fetchCategories,
     fetchProducts,
     fetchProductsByCategory,
-    loading
+    loading,
   } = useContext(ProductContext);
 
+  const [selectedCategory, setSelectedCategory] = useState("all"); // default selection
+
   // Load categories when component mounts
- useFocusEffect(
-  useCallback(() => {
-    fetchCategories();
-  }, [])
- );
+  useFocusEffect(
+    useCallback(() => {
+      fetchCategories();
+    }, [])
+  );
+
+  const handleCategoryPress = (catId) => {
+    setSelectedCategory(catId);
+    if (catId === "all") {
+      fetchProducts();
+    } else {
+      fetchProductsByCategory(catId);
+    }
+  };
 
   if (loading && categories.length === 0) {
     return <ActivityIndicator style={{ marginVertical: 20 }} />;
@@ -39,27 +50,46 @@ export default function Category() {
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         {/* ALL PRODUCTS BUTTON */}
         <TouchableOpacity
-          style={[styles.categoryItem, styles.allButton]}
-          onPress={fetchProducts}
+          style={[
+            styles.categoryItem,
+            selectedCategory === "all" && styles.selectedCategoryItem,
+          ]}
+          onPress={() => handleCategoryPress("all")}
         >
-          <Text style={styles.categoryText}>All</Text>
+          <Text
+            style={[
+              styles.categoryText,
+              selectedCategory === "all" && styles.selectedCategoryText,
+            ]}
+          >
+            All
+          </Text>
         </TouchableOpacity>
 
         {/* REAL CATEGORIES FROM BACKEND */}
         {categories.map((cat) => (
           <TouchableOpacity
             key={cat._id}
-            style={styles.categoryItem}
-            onPress={() => fetchProductsByCategory(cat._id)}
+            style={[
+              styles.categoryItem,
+              selectedCategory === cat._id && styles.selectedCategoryItem,
+            ]}
+            onPress={() => handleCategoryPress(cat._id)}
           >
-            <Text style={styles.categoryText}>{cat.name}</Text>
+            <Text
+              style={[
+                styles.categoryText,
+                selectedCategory === cat._id && styles.selectedCategoryText,
+              ]}
+            >
+              {cat.name}
+            </Text>
           </TouchableOpacity>
         ))}
       </ScrollView>
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: { marginBottom: 8 },
@@ -72,4 +102,11 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   categoryText: { fontSize: 14, color: "#333" },
+  selectedCategoryItem: {
+    backgroundColor: "#27ae60", // dark gray for selected
+  },
+  selectedCategoryText: {
+    color: "#fff", // white text for selected
+    fontWeight: "bold",
+  },
 });

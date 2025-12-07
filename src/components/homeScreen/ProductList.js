@@ -9,6 +9,7 @@ import {
   StyleSheet,
   Dimensions,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { ProductContext } from "../../context/ProductProvider";
 import { MaterialCommunityIcons } from "@expo/vector-icons"; // for currency icon
@@ -17,7 +18,7 @@ const { width } = Dimensions.get("window");
 
 export default function ProductList({ search }) {
   const navigation = useNavigation();
-  const { products, fetchProducts } = useContext(ProductContext);
+  const { products, fetchProducts, loading } = useContext(ProductContext);
 
   useEffect(() => {
     fetchProducts();
@@ -30,49 +31,58 @@ export default function ProductList({ search }) {
   const numColumns = 3;
   const itemWidth = (width - 16 * 2 - 10 * (numColumns - 1)) / numColumns;
 
+  // SHOW LOADING IF FETCHING PRODUCTS
+  if (loading) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" color="#27ae60" />
+        <Text>Loading products...</Text>
+      </View>
+    );
+  }
+
+  if (!products.length) {
+    return (
+      <View style={styles.center}>
+        <Text>No products found</Text>
+      </View>
+    );
+  }
+
   return (
     <FlatList
-      data={filteredProducts}
-      keyExtractor={(item) => item?._id}
-      numColumns={numColumns}
-      contentContainerStyle={{
-        padding: 16,
-        paddingBottom: 16,
-      }}
-      columnWrapperStyle={{
-        justifyContent: "space-between",
-        marginBottom: 16,
-      }}
-      ListFooterComponent={<View style={{ height: 60 }} />}
-      renderItem={({ item }) => (
-        <TouchableOpacity
-          onPress={() =>
-            navigation.navigate("ProductScreen", { productId: item._id })
-          }
-          style={[styles.card, { width: itemWidth }]}
-          activeOpacity={0.8}
-        >
-          <Image
-            source={{ uri: item.images?.[0] }}
-            style={styles.image}
-          />
-          <Text style={styles.name} numberOfLines={1}>
-            {item.name}
-          </Text>
+  data={filteredProducts}
+  keyExtractor={(item) => item._id}
+  numColumns={numColumns}
+  contentContainerStyle={{ padding: 16, paddingBottom: 16 }}
+  columnWrapperStyle={{ justifyContent: "flex-start", marginBottom: 16 }}
+  renderItem={({ item, index }) => (
+    <TouchableOpacity
+      onPress={() => navigation.navigate("ProductScreen", { productId: item._id })}
+      style={[
+        styles.card,
+        {
+          width: itemWidth,
+          marginRight: (index % numColumns) !== (numColumns - 1) ? 10 : 0,
+        },
+      ]}
+      activeOpacity={0.8}
+    >
+      <Image source={{ uri: item.images?.[0] }} style={styles.image} />
+      <Text style={styles.name} numberOfLines={1}>{item.name}</Text>
+      <View style={styles.priceTag}>
+        <MaterialCommunityIcons
+          name="currency-inr"
+          size={14}
+          color="#fff"
+          style={{ marginRight: 4 }}
+        />
+        <Text style={styles.priceText}>{item.basePrice}</Text>
+      </View>
+    </TouchableOpacity>
+  )}
+/>
 
-          {/* Highlighted Price Section with Icon */}
-          <View style={styles.priceTag}>
-            <MaterialCommunityIcons
-              name="currency-inr"
-              size={14}
-              color="#fff"
-              style={{ marginRight: 4 }}
-            />
-            <Text style={styles.priceText}>{item.basePrice}</Text>
-          </View>
-        </TouchableOpacity>
-      )}
-    />
   );
 }
 
@@ -120,5 +130,12 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 12,
     fontWeight: "bold",
+  },
+
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 50,
   },
 });
