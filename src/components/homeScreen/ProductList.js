@@ -51,6 +51,7 @@ export default function ProductList({ search }) {
 
   return (
     <FlatList
+    scrollEnabled={false}
   data={filteredProducts}
   keyExtractor={(item) => item._id}
   numColumns={numColumns}

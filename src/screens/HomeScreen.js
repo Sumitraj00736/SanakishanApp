@@ -1,5 +1,4 @@
-// src/screens/HomeScreen.js
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useRef } from "react";
 import {
   View,
   Text,
@@ -9,6 +8,7 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
+  Animated,
 } from "react-native";
 
 import Heading from "../components/homeScreen/Heading";
@@ -19,75 +19,110 @@ import ProductGrid from "../components/homeScreen/ProductList";
 import BottomBar from "../components/navigation/BottomBar";
 import { AuthContext } from "../context/AuthProvider";
 
+const SLIDER_HEIGHT = 200;
+const CATEGORY_HEIGHT = 150;
 
 export default function HomeScreen() {
   const [search, setSearch] = useState("");
   const [memberModalVisible, setMemberModalVisible] = useState(false);
   const [memberId, setMemberId] = useState("");
 
-  const { login } = useContext(AuthContext);           
+  const { login } = useContext(AuthContext);
+
+  const scrollY = useRef(new Animated.Value(0)).current;
+  const scrollClamped = Animated.diffClamp(scrollY, 0, SLIDER_HEIGHT);
+
+  const sliderTranslateY = scrollClamped.interpolate({
+    inputRange: [0, SLIDER_HEIGHT],
+    outputRange: [0, -SLIDER_HEIGHT],
+  });
+
+  const stickyCategoryOpacity = scrollClamped.interpolate({
+    inputRange: [SLIDER_HEIGHT - 20, SLIDER_HEIGHT],
+    outputRange: [0, 1],
+    extrapolate: "clamp",
+  });
 
   const handleMemberSave = async () => {
-    if (!memberId) {
-      alert("Please enter Member ID");
-      return;
-    }
+    if (!memberId) return alert("Please enter Member ID");
 
-    // Call API login
     const res = await login(memberId);
-
-    if (res.success) {
+    if (res?.success) {
       alert("Login successful!");
-      setMemberModalVisible(false);  // Close modal
+      setMemberModalVisible(false);
     } else {
-      alert(res.message || "Login failed");
+      alert(res?.message || "Login failed");
     }
   };
 
   return (
     <View style={styles.container}>
-      {/* Top Section */}
-      <View style={styles.topSection}>
-        <Heading 
-          onMemberPress={() => setMemberModalVisible(true)}
-          hasMemberId={!!memberId}
-        />
-        <Slider />
+      {/* FIXED HEADER */}
+      <View style={styles.fixedHeader}>
+        <Heading onMemberPress={() => setMemberModalVisible(true)} />
         <SearchBar search={search} setSearch={setSearch} />
-        <Category />
       </View>
 
-      {/* Products */}
-      <Text style={styles.productsLabel}>Products</Text>
-      <ProductGrid search={search} />
-
-      {/* Member ID Modal */}
-      <Modal
-        visible={memberModalVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setMemberModalVisible(false)}
+      {/* STICKY CATEGORY (appears after slider collapses) */}
+      <Animated.View
+        style={[
+          styles.stickyCategory,
+          { opacity: stickyCategoryOpacity },
+        ]}
+        pointerEvents="box-none"
       >
+        <Category />
+      </Animated.View>
+
+      {/* SCROLL CONTENT */}
+      <Animated.ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{
+          paddingTop: SLIDER_HEIGHT + CATEGORY_HEIGHT, // space for slider + scrollable category
+          paddingBottom: 120,
+          backgroundColor: "green",
+        }}
+        scrollEventThrottle={30}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: true }
+        )}
+      >
+        {/* SLIDER + SCROLLABLE CATEGORY */}
+        <Animated.View
+          style={[
+            styles.sliderWrapper,
+            { transform: [{ translateY: sliderTranslateY }] },
+          ]}
+        >
+          <Slider />
+          <Category />
+        </Animated.View>
+
+        {/* PRODUCTS */}
+        <View style={{ zIndex: 0 }}>
+          <Text style={styles.productsLabel}>Products</Text>
+          <ProductGrid search={search} />
+        </View>
+      </Animated.ScrollView>
+
+      {/* MODAL */}
+      <Modal visible={memberModalVisible} transparent animationType="fade">
         <KeyboardAvoidingView
           style={styles.modalOverlay}
           behavior={Platform.OS === "ios" ? "padding" : undefined}
         >
           <View style={styles.modalContainer}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Enter Member ID</Text>
-              <TouchableOpacity onPress={() => setMemberModalVisible(false)}>
-                <Text style={styles.closeButton}>X</Text>
-              </TouchableOpacity>
-            </View>
-
+            <Text style={styles.modalTitle}>Enter Member ID</Text>
             <TextInput
               style={styles.memberInput}
-              placeholder="Member ID"
               value={memberId}
               onChangeText={setMemberId}
             />
-
-            <TouchableOpacity style={styles.saveButton} onPress={handleMemberSave}>
+            <TouchableOpacity
+              style={styles.saveButton}
+              onPress={handleMemberSave}
+            >
               <Text style={styles.saveButtonText}>Save</Text>
             </TouchableOpacity>
           </View>
@@ -100,49 +135,80 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
-  topSection: { backgroundColor: "green", padding: 16, paddingBottom: 24 },
+  container: { flex: 1 },
+
+  fixedHeader: {
+    backgroundColor: "green",
+    paddingTop: 16,
+    paddingHorizontal: 16,
+    zIndex: 100,
+  },
+
+  sliderWrapper: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "green",
+    zIndex: 1,
+    paddingHorizontal: 16,
+  },
+
+  stickyCategory: {
+    position: "absolute",
+    top: 80, // below header
+    left: 0,
+    right: 0,
+    height: CATEGORY_HEIGHT,
+    backgroundColor: "green",
+    zIndex: 2,
+    paddingHorizontal: 16,
+  },
+
   productsLabel: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "black",
+    color: "#fff",
     marginLeft: 16,
     marginTop: 16,
   },
 
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
     justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
+
   modalContainer: {
-    width: "80%",
-    backgroundColor: "white",
-    borderRadius: 10,
+    backgroundColor: "#fff",
+    margin: 20,
     padding: 16,
+    borderRadius: 10,
   },
-  modalHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 16,
+
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 12,
   },
-  modalTitle: { fontSize: 18, fontWeight: "bold" },
-  closeButton: { fontSize: 18, fontWeight: "bold", color: "red" },
+
   memberInput: {
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    marginBottom: 16,
+    padding: 10,
+    marginBottom: 12,
   },
+
   saveButton: {
     backgroundColor: "green",
-    paddingVertical: 12,
+    padding: 12,
     borderRadius: 8,
     alignItems: "center",
   },
-  saveButtonText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
+
+  saveButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
 });

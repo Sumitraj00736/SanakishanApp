@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
   sliderContainer: { marginBottom: 16 },
   image: {
     width: width - 32,
-    height: 200,
+    height: 400,
     borderRadius: 10,
     marginRight: 10,
     backgroundColor: "#eee",

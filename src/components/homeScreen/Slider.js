@@ -1,15 +1,14 @@
 import React, { useRef, useState, useEffect } from "react";
-import { ScrollView, StyleSheet, Dimensions, View } from "react-native";
-import { Video } from "expo-av";
+import { ScrollView, StyleSheet, Dimensions, View, Image } from "react-native";
 
 const { width } = Dimensions.get("window");
-const videoHeight = (width - 32) * 9 / 16;
+const imageHeight = (width - 32) * 9 / 16; // same aspect ratio
 
 export default function Slider() {
   const banners = [
-    "https://res.cloudinary.com/dhah3xwej/video/upload/v1761276679/PixVerse_V5_Image_Text_360P_generate_image_rel_2_okhcx7.mp4",
-    "https://res.cloudinary.com/dhah3xwej/video/upload/v1761277124/PixVerse_V5_Image_Text_360P_generate_image_rel_3_hlcvd8.mp4",
-    "https://res.cloudinary.com/dhah3xwej/video/upload/v1761277349/PixVerse_V5_Image_Text_360P_generate_image_rel_lutx4v.mp4",
+    "https://res.cloudinary.com/dhah3xwej/image/upload/v1764401658/poster2_1_ms7cdf.jpg",
+    "https://res.cloudinary.com/dhah3xwej/image/upload/v1764401714/poster3_1_u3kw3o.jpg",
+    // "https://res.cloudinary.com/dhah3xwej/image/upload/v1761277349/PixVerse_V5_Image_Text_360P_generate_image_rel_lutx4v.jpg",
   ];
 
   const scrollRef = useRef(null);
@@ -41,15 +40,12 @@ export default function Slider() {
         scrollEventThrottle={16}
         style={styles.scrollView}
       >
-        {banners.map((videoUri, index) => (
-          <Video
+        {banners.map((imageUri, index) => (
+          <Image
             key={index}
-            source={{ uri: videoUri }}
-            style={[styles.bannerVideo, { height: videoHeight }]}
+            source={{ uri: imageUri }}
+            style={[styles.bannerImage, { height: imageHeight }]}
             resizeMode="cover"
-            shouldPlay
-            isLooping
-            isMuted
           />
         ))}
       </ScrollView>
@@ -73,7 +69,7 @@ export default function Slider() {
 const styles = StyleSheet.create({
   container: { marginBottom: 12 },
   scrollView: {},
-  bannerVideo: {
+  bannerImage: {
     width: width - 32,
     borderRadius: 10,
     marginRight: 10,
