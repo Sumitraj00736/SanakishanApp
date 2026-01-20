@@ -2,12 +2,13 @@
   "name": "shanakishanapp",
   "version": "1.0.0",
   "main": "index.js",
-  "scripts": {
-    "start": "expo start",
-    "android": "expo run:android",
-    "ios": "expo run:ios",
-    "web": "expo start --web"
-  },
+"scripts": {
+  "start": "expo start",
+  "android": "expo run:android",
+  "ios": "expo run:ios",
+  "web": "expo start --web",
+  "build:android": "eas build -p android --profile production"
+},
   "dependencies": {
     "@react-native-community/datetimepicker": "^8.4.4",
     "@react-navigation/bottom-tabs": "^7.8.4",

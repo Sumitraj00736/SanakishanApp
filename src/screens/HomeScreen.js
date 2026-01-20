@@ -18,6 +18,8 @@ import Category from "../components/homeScreen/Category";
 import ProductGrid from "../components/homeScreen/ProductList";
 import BottomBar from "../components/navigation/BottomBar";
 import { AuthContext } from "../context/AuthProvider";
+import { MaterialIcons } from "@expo/vector-icons";
+
 
 const SLIDER_HEIGHT = 200;
 const CATEGORY_HEIGHT = 150;
@@ -65,10 +67,7 @@ export default function HomeScreen() {
 
       {/* STICKY CATEGORY (appears after slider collapses) */}
       <Animated.View
-        style={[
-          styles.stickyCategory,
-          { opacity: stickyCategoryOpacity },
-        ]}
+        style={[styles.stickyCategory, { opacity: stickyCategoryOpacity }]}
         pointerEvents="box-none"
       >
         <Category />
@@ -78,7 +77,7 @@ export default function HomeScreen() {
       <Animated.ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={{
-          paddingTop: SLIDER_HEIGHT + CATEGORY_HEIGHT, // space for slider + scrollable category
+          paddingTop: SLIDER_HEIGHT + CATEGORY_HEIGHT, 
           paddingBottom: 120,
           backgroundColor: "green",
         }}
@@ -113,12 +112,23 @@ export default function HomeScreen() {
           behavior={Platform.OS === "ios" ? "padding" : undefined}
         >
           <View style={styles.modalContainer}>
+            {/* Close (Cross) Button */}
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setMemberModalVisible(false)}
+            >
+              <MaterialIcons name="close" size={22} color="#333" />
+            </TouchableOpacity>
+
             <Text style={styles.modalTitle}>Enter Member ID</Text>
+
             <TextInput
               style={styles.memberInput}
               value={memberId}
               onChangeText={setMemberId}
+              placeholder="Member ID"
             />
+
             <TouchableOpacity
               style={styles.saveButton}
               onPress={handleMemberSave}
@@ -211,4 +221,12 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
   },
+  closeButton: {
+  position: "absolute",
+  top: 10,
+  right: 10,
+  zIndex: 10,
+  padding: 4,
+},
+
 });
