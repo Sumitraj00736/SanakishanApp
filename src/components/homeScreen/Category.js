@@ -11,6 +11,7 @@ import {
 
 import { ProductContext } from "../../context/ProductProvider";
 import { useFocusEffect } from "@react-navigation/native";
+import CategorySkeleton from "../common/CategorySkeleton";
 
 export default function Category() {
   const {
@@ -39,9 +40,9 @@ export default function Category() {
     }
   };
 
-  if (loading && categories.length === 0) {
-    return <ActivityIndicator style={{ marginVertical: 20 }} />;
-  }
+if (loading && categories.length === 0) {
+  return <CategorySkeleton />;
+}
 
   return (
     <View style={styles.container}>

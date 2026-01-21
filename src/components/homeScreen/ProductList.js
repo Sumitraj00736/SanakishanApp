@@ -1,4 +1,3 @@
-// src/components/homeScreen/ProductGrid.js
 import React, { useContext, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import {
@@ -9,14 +8,14 @@ import {
   StyleSheet,
   Dimensions,
   TouchableOpacity,
-  ActivityIndicator,
 } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { ProductContext } from "../../context/ProductProvider";
-import { MaterialCommunityIcons } from "@expo/vector-icons"; // for currency icon
+import ProductSkeleton from "../common/ProductSkeleton";
 
 const { width } = Dimensions.get("window");
 
-export default function ProductList({ search }) {
+export default function ProductList({ search = "" }) {
   const navigation = useNavigation();
   const { products, fetchProducts, loading } = useContext(ProductContext);
 
@@ -29,19 +28,29 @@ export default function ProductList({ search }) {
   );
 
   const numColumns = 3;
-  const itemWidth = (width - 16 * 2 - 10 * (numColumns - 1)) / numColumns;
+  const ITEM_MARGIN = 10;
+  const HORIZONTAL_PADDING = 16;
 
-  // SHOW LOADING IF FETCHING PRODUCTS
+  const itemWidth =
+    (width - HORIZONTAL_PADDING * 2 - ITEM_MARGIN * (numColumns - 1)) /
+    numColumns;
+
+  /* -------------------- SKELETON LOADER -------------------- */
   if (loading) {
     return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color="#27ae60" />
-        <Text>Loading products...</Text>
-      </View>
+      <FlatList
+        scrollEnabled={false}
+        data={Array.from({ length: 6 })}
+        keyExtractor={(_, index) => index.toString()}
+        numColumns={numColumns}
+        contentContainerStyle={{ padding: 16 }}
+        columnWrapperStyle={{ marginBottom: 16 }}
+        renderItem={({ index }) => <ProductSkeleton index={index} />}
+      />
     );
   }
 
-  if (!products.length) {
+  if (!filteredProducts.length) {
     return (
       <View style={styles.center}>
         <Text>No products found</Text>
@@ -49,41 +58,53 @@ export default function ProductList({ search }) {
     );
   }
 
+  /* -------------------- PRODUCT GRID -------------------- */
   return (
     <FlatList
-    scrollEnabled={false}
-  data={filteredProducts}
-  keyExtractor={(item) => item._id}
-  numColumns={numColumns}
-  contentContainerStyle={{ padding: 16, paddingBottom: 16 }}
-  columnWrapperStyle={{ justifyContent: "flex-start", marginBottom: 16 }}
-  renderItem={({ item, index }) => (
-    <TouchableOpacity
-      onPress={() => navigation.navigate("ProductScreen", { productId: item._id })}
-      style={[
-        styles.card,
-        {
-          width: itemWidth,
-          marginRight: (index % numColumns) !== (numColumns - 1) ? 10 : 0,
-        },
-      ]}
-      activeOpacity={0.8}
-    >
-      <Image source={{ uri: item.images?.[0] }} style={styles.image} />
-      <Text style={styles.name} numberOfLines={1}>{item.name}</Text>
-      <View style={styles.priceTag}>
-        <MaterialCommunityIcons
-          name="currency-inr"
-          size={14}
-          color="#fff"
-          style={{ marginRight: 4 }}
-        />
-        <Text style={styles.priceText}>{item.basePrice}</Text>
-      </View>
-    </TouchableOpacity>
-  )}
-/>
+      scrollEnabled={false}
+      data={filteredProducts}
+      keyExtractor={(item) => item._id}
+      numColumns={numColumns}
+      contentContainerStyle={{ padding: 16 }}
+      columnWrapperStyle={{ marginBottom: 16 }}
+      renderItem={({ item, index }) => (
+        <TouchableOpacity
+          activeOpacity={0.85}
+          onPress={() =>
+            navigation.navigate("ProductScreen", {
+              productId: item._id,
+            })
+          }
+          style={[
+            styles.card,
+            {
+              width: itemWidth,
+              marginRight:
+                index % numColumns !== numColumns - 1 ? ITEM_MARGIN : 0,
+            },
+          ]}
+        >
+          <Image
+            source={{ uri: item.images?.[0] }}
+            style={styles.image}
+          />
 
+          <Text style={styles.name} numberOfLines={1}>
+            {item.name}
+          </Text>
+
+          <View style={styles.priceTag}>
+            <MaterialCommunityIcons
+              name="currency-inr"
+              size={14}
+              color="#fff"
+              style={{ marginRight: 4 }}
+            />
+            <Text style={styles.priceText}>{item.basePrice}</Text>
+          </View>
+        </TouchableOpacity>
+      )}
+    />
   );
 }
 
@@ -122,7 +143,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingVertical: 4,
     paddingHorizontal: 8,
-    backgroundColor: "#27ae60", // Green highlight
+    backgroundColor: "#27ae60",
     borderRadius: 20,
     marginTop: 4,
   },
