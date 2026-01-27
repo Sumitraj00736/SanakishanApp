@@ -4,10 +4,10 @@ export const ProductContext = createContext();
 import { AuthContext } from "./AuthProvider";
 
 
-const BASE_URL = "https://shanakishan-backend.onrender.com/api/products";
-const BOOKING_URL = "https://shanakishan-backend.onrender.com/api/bookings";
-const SUPPORT_URL = "https://shanakishan-backend.onrender.com/api/support";
-const CATEGORY_URL = "https://shanakishan-backend.onrender.com/api/categories";
+const BASE_URL = "https://sanaapi.thesanatanisolutions.com/api/products";
+const BOOKING_URL = "https://sanaapi.thesanatanisolutions.com/api/bookings";
+const SUPPORT_URL = "https://sanaapi.thesanatanisolutions.com/api/support";
+const CATEGORY_URL = "https://sanaapi.thesanatanisolutions.com/api/categories";
 
 // const BASE_URL = "http://15.206.128.54:4000/api/products";
 // const BOOKING_URL = "http://15.206.128.54:4000/api/bookings";
@@ -146,7 +146,7 @@ const fetchProductsByCategory = useCallback(async (categoryId) => {
     setError("");
 
     const res = await fetch(
-      `https://shanakishan-backend.onrender.com/api/categories/${categoryId}/products`
+      `https://sanaapi.thesanatanisolutions.com/api/categories/${categoryId}/products`
     );
 
     const data = await res.json();

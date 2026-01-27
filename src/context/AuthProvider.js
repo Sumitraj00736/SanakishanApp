@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
 
       const response = await axios.post(
-        "https://shanakishan-backend.onrender.com/api/members/login",
+        "https://sanaapi.thesanatanisolutions.com/api/members/login",
         { memberId }
       );
 
