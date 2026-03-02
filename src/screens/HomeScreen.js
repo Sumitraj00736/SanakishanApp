@@ -19,12 +19,17 @@ import ProductGrid from "../components/homeScreen/ProductList";
 import BottomBar from "../components/navigation/BottomBar";
 import { AuthContext } from "../context/AuthProvider";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
+import { useNavigation } from "@react-navigation/native";
+import Toast from "react-native-toast-message";
 
 
 const SLIDER_HEIGHT = 200;
 const CATEGORY_HEIGHT = 150;
 
 export default function HomeScreen() {
+  const navigation = useNavigation();
+  const { t } = useTranslation();
   const [search, setSearch] = useState("");
   const [memberModalVisible, setMemberModalVisible] = useState(false);
   const [memberId, setMemberId] = useState("");
@@ -46,14 +51,17 @@ export default function HomeScreen() {
   });
 
   const handleMemberSave = async () => {
-    if (!memberId) return alert("Please enter Member ID");
+    if (!memberId) {
+      Toast.show({ type: "error", text1: t("common.error"), text2: t("auth.enterMemberId") });
+      return;
+    }
 
     const res = await login(memberId);
     if (res?.success) {
-      alert("Login successful!");
+      Toast.show({ type: "success", text1: t("common.success"), text2: t("auth.loginSuccess") });
       setMemberModalVisible(false);
     } else {
-      alert(res?.message || "Login failed");
+      Toast.show({ type: "error", text1: t("common.error"), text2: res?.message || t("auth.loginFailed") });
     }
   };
 
@@ -61,7 +69,10 @@ export default function HomeScreen() {
     <View style={styles.container}>
       {/* FIXED HEADER */}
       <View style={styles.fixedHeader}>
-        <Heading onMemberPress={() => setMemberModalVisible(true)} />
+        <Heading
+          onMemberPress={() => setMemberModalVisible(true)}
+          onProfilePress={() => navigation.navigate("Profile")}
+        />
         <SearchBar search={search} setSearch={setSearch} />
       </View>
 
@@ -100,7 +111,7 @@ export default function HomeScreen() {
 
         {/* PRODUCTS */}
         <View style={{ zIndex: 0 }}>
-          <Text style={styles.productsLabel}>Products</Text>
+          <Text style={styles.productsLabel}>{t("common.products")}</Text>
           <ProductGrid search={search} />
         </View>
       </Animated.ScrollView>
@@ -120,20 +131,20 @@ export default function HomeScreen() {
               <MaterialIcons name="close" size={22} color="#333" />
             </TouchableOpacity>
 
-            <Text style={styles.modalTitle}>Enter Member ID</Text>
+            <Text style={styles.modalTitle}>{t("auth.enterMemberId")}</Text>
 
             <TextInput
               style={styles.memberInput}
               value={memberId}
               onChangeText={setMemberId}
-              placeholder="Member ID"
+              placeholder={t("auth.memberId")}
             />
 
             <TouchableOpacity
               style={styles.saveButton}
               onPress={handleMemberSave}
             >
-              <Text style={styles.saveButtonText}>Save</Text>
+              <Text style={styles.saveButtonText}>{t("common.save")}</Text>
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>

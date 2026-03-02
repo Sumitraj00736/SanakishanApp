@@ -11,10 +11,12 @@ import {
 import { useRoute } from "@react-navigation/native";
 import { ProductContext } from "../../context/ProductProvider";
 import { AuthContext } from "../../context/AuthProvider";
+import { useTranslation } from "react-i18next";
 
 const { width } = Dimensions.get("window");
 
 export default function ProductDetail() {
+  const { t } = useTranslation();
   const route = useRoute();
   const { productId } = route.params;
   // console.log("id:"+ productId);
@@ -30,7 +32,7 @@ export default function ProductDetail() {
   if (!productDetail) {
     return (
       <View style={styles.container}>
-        <Text>Product not found</Text>
+        <Text>{t("common.noProducts")}</Text>
       </View>
     );
   }
@@ -70,7 +72,7 @@ export default function ProductDetail() {
 
 
 <Text style={styles.price}>
-  Price: ₹{user ? productDetail.memberPrice : productDetail.basePrice}
+  {t("product.price")}: NPR {user ? productDetail.memberPrice : productDetail.basePrice}
 </Text>
     </ScrollView>
   );

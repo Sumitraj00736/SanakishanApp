@@ -15,12 +15,14 @@ import BottomBar from "../components/navigation/BottomBar";
 import { ProductContext } from "../context/ProductProvider";
 import { useNavigation } from "@react-navigation/native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 
 const { width } = Dimensions.get("window");
 
 export default function CategoriesScreen() {
+  const { t } = useTranslation();
   const navigation = useNavigation();
-  const { categories, fetchCategories } = useContext(ProductContext);
+  const { categories, fetchCategories, fetchProductsByCategory } = useContext(ProductContext);
 
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [categoryProducts, setCategoryProducts] = useState([]);
@@ -41,10 +43,7 @@ export default function CategoriesScreen() {
     setSelectedCategory(catId);
     setLoading(true);
     try {
-      const res = await fetch(
-        `https://shanakishan-backend.onrender.com/api/categories/${catId}/products`
-      );
-      const data = await res.json();
+      const data = await fetchProductsByCategory(catId);
       setCategoryProducts(data); // store in local state
     } catch (err) {
       console.error("Failed to fetch category products", err);
@@ -65,7 +64,7 @@ export default function CategoriesScreen() {
     return (
       <View style={styles.center}>
         <ActivityIndicator size="large" color="green" />
-        <Text style={{ marginTop: 10 }}>Loading...</Text>
+        <Text style={{ marginTop: 10 }}>{t("common.loading")}</Text>
       </View>
     );
   }
@@ -92,7 +91,7 @@ export default function CategoriesScreen() {
           )}
           ListEmptyComponent={
             <View style={styles.center}>
-              <Text>No categories found</Text>
+              <Text>{t("common.noCategories")}</Text>
             </View>
           }
         />
@@ -102,12 +101,12 @@ export default function CategoriesScreen() {
             style={styles.backButton}
             onPress={() => setSelectedCategory(null)}
           >
-            <Text style={{ color: "#fff" }}> Back to Categories</Text>
+              <Text style={{ color: "#fff" }}> {t("common.backToCategories")}</Text>
           </TouchableOpacity>
 
           {filteredProducts.length === 0 ? (
             <View style={styles.center}>
-              <Text>No products found</Text>
+                  <Text>{t("common.noProducts")}</Text>
             </View>
           ) : (
             <FlatList
@@ -132,13 +131,7 @@ export default function CategoriesScreen() {
                     {item.name}
                   </Text>
                   <View style={styles.priceTag}>
-                    <MaterialCommunityIcons
-                      name="currency-inr"
-                      size={14}
-                      color="#fff"
-                      style={{ marginRight: 4 }}
-                    />
-                    <Text style={styles.priceText}>{item.basePrice}</Text>
+                    <Text style={styles.priceText}>NPR {item.basePrice}</Text>
                   </View>
                 </TouchableOpacity>
               )}

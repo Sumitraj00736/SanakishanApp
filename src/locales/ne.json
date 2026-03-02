@@ -1,5 +1,78 @@
 {
-  "product": "उत्पादन विवरण",
-  "search": "उपकरण खोज्नुहोस्...",   
-  "categories": "श्रेणीहरू"
+  "appTitle": "महिला सानाकिशान",
+  "nav": {
+    "home": "होम",
+    "search": "खोज",
+    "categories": "श्रेणी",
+    "products": "उत्पादन",
+    "support": "सहायता",
+    "profile": "प्रोफाइल"
+  },
+  "common": {
+    "loading": "लोड हुँदैछ...",
+    "save": "सेभ",
+    "products": "उत्पादनहरू",
+    "categories": "श्रेणीहरू",
+    "all": "सबै",
+    "error": "त्रुटि",
+    "success": "सफल",
+    "noProducts": "कुनै उत्पादन फेला परेन",
+    "noCategories": "कुनै श्रेणी फेला परेन",
+    "backToCategories": "श्रेणीहरूमा फर्कनुहोस्"
+  },
+  "search": {
+    "placeholder": "उपकरण खोज्नुहोस्..."
+  },
+  "auth": {
+    "memberId": "सदस्य आईडी",
+    "enterMemberId": "कृपया सदस्य आईडी लेख्नुहोस्",
+    "loginSuccess": "लगइन सफल भयो!",
+    "loginFailed": "लगइन असफल भयो"
+  },
+  "product": {
+    "price": "मूल्य"
+  },
+  "booking": {
+    "requiredFields": "कृपया आवश्यक सबै विवरण भर्नुहोस्",
+    "productNotLoaded": "उत्पादन विवरण लोड भएको छैन",
+    "confirmed": "बुकिङ पुष्टि भयो",
+    "failed": "बुकिङ असफल भयो",
+    "name": "तपाईंको नाम",
+    "namePlaceholder": "तपाईंको नाम लेख्नुहोस्",
+    "phone": "फोन नम्बर",
+    "phonePlaceholder": "फोन नम्बर लेख्नुहोस्",
+    "email": "इमेल",
+    "emailPlaceholder": "इमेल लेख्नुहोस्",
+    "quantity": "परिमाण",
+    "startDate": "सुरु मिति र समय",
+    "endDate": "अन्त्य मिति र समय",
+    "bookNow": "अहिले बुक गर्नुहोस्"
+  },
+  "support": {
+    "title": "ग्राहक सहायता",
+    "subtitle": "तलको फाराम भर्नुहोस्, हाम्रो टोलीले चाँडै सम्पर्क गर्नेछ।",
+    "nameRequired": "नाम अनिवार्य छ",
+    "phoneRequired": "फोन नम्बर अनिवार्य छ",
+    "phoneInvalid": "मान्य फोन नम्बर लेख्नुहोस्",
+    "success": "सहायता टिकट सफलतापूर्वक सिर्जना भयो",
+    "fullName": "पूरा नाम",
+    "phone": "फोन नम्बर",
+    "email": "इमेल ठेगाना",
+    "message": "समस्या विवरण लेख्नुहोस्...",
+    "submit": "अनुरोध पठाउनुहोस्"
+  },
+  "profile": {
+    "title": "सदस्य प्रोफाइल",
+    "subtitle": "सदस्य खाता र भाषा सेटिङ व्यवस्थापन गर्नुहोस्।",
+    "memberId": "सदस्य आईडी",
+    "name": "नाम",
+    "phone": "फोन",
+    "email": "इमेल",
+    "discount": "छुट",
+    "validUntil": "मान्य मिति",
+    "language": "भाषा",
+    "logout": "लगआउट",
+    "notLoggedIn": "तपाईं अहिले अतिथि मोडमा हुनुहुन्छ।",
+    "selectLanguage": "भाषा चयन गर्नुहोस्"
+  }
 }

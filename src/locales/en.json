@@ -1,4 +1,78 @@
 {
-  "productDetail": "Product Detail",
-  "search": "Search equipment..."
+  "appTitle": "Mahila SanaKishan",
+  "nav": {
+    "home": "Home",
+    "search": "Search",
+    "categories": "Categories",
+    "products": "Products",
+    "support": "Support",
+    "profile": "Profile"
+  },
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "products": "Products",
+    "categories": "Categories",
+    "all": "All",
+    "error": "Error",
+    "success": "Success",
+    "noProducts": "No products found",
+    "noCategories": "No categories found",
+    "backToCategories": "Back to Categories"
+  },
+  "search": {
+    "placeholder": "Search equipment..."
+  },
+  "auth": {
+    "memberId": "Member ID",
+    "enterMemberId": "Please enter Member ID",
+    "loginSuccess": "Login successful!",
+    "loginFailed": "Login failed"
+  },
+  "product": {
+    "price": "Price"
+  },
+  "booking": {
+    "requiredFields": "Please fill all required fields",
+    "productNotLoaded": "Product details not loaded yet",
+    "confirmed": "Booking Confirmed",
+    "failed": "Booking Failed",
+    "name": "Your Name",
+    "namePlaceholder": "Enter your name",
+    "phone": "Phone Number",
+    "phonePlaceholder": "Enter your phone number",
+    "email": "Email",
+    "emailPlaceholder": "Enter your email",
+    "quantity": "Quantity",
+    "startDate": "Start Date & Time",
+    "endDate": "End Date & Time",
+    "bookNow": "Book Now"
+  },
+  "support": {
+    "title": "Customer Support",
+    "subtitle": "Fill out the form below, and our team will contact you shortly.",
+    "nameRequired": "Name field is required",
+    "phoneRequired": "Phone field is required",
+    "phoneInvalid": "Enter a valid phone number",
+    "success": "Support ticket created successfully",
+    "fullName": "Full Name",
+    "phone": "Phone Number",
+    "email": "Email Address",
+    "message": "Describe your issue...",
+    "submit": "Submit Request"
+  },
+  "profile": {
+    "title": "Member Profile",
+    "subtitle": "Manage your member account and language preferences.",
+    "memberId": "Member ID",
+    "name": "Name",
+    "phone": "Phone",
+    "email": "Email",
+    "discount": "Discount",
+    "validUntil": "Valid Until",
+    "language": "Language",
+    "logout": "Logout",
+    "notLoggedIn": "You are browsing as a guest.",
+    "selectLanguage": "Select Language"
+  }
 }

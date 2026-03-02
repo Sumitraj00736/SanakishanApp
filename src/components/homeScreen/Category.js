@@ -12,8 +12,10 @@ import {
 import { ProductContext } from "../../context/ProductProvider";
 import { useFocusEffect } from "@react-navigation/native";
 import CategorySkeleton from "../common/CategorySkeleton";
+import { useTranslation } from "react-i18next";
 
 export default function Category() {
+  const { t } = useTranslation();
   const {
     categories,
     fetchCategories,
@@ -46,7 +48,7 @@ if (loading && categories.length === 0) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Categories</Text>
+      <Text style={styles.label}>{t("common.categories")}</Text>
 
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         {/* ALL PRODUCTS BUTTON */}
@@ -63,7 +65,7 @@ if (loading && categories.length === 0) {
               selectedCategory === "all" && styles.selectedCategoryText,
             ]}
           >
-            All
+            {t("common.all")}
           </Text>
         </TouchableOpacity>
 

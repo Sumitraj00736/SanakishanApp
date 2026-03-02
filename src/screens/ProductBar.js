@@ -1,27 +1,48 @@
-import React, { useState } from "react";
-import { View, Text, FlatList, StyleSheet } from "react-native";
+import React, { useState, useRef } from "react";
+import { View, StyleSheet, Animated } from "react-native";
 import Heading from "../components/homeScreen/Heading";
 import SearchBar from "../components/homeScreen/SearchBar";
 import BottomBar from "../components/navigation/BottomBar";
-import ProductGrid from "../components/homeScreen/ProductList"
-
-// Sample product list (you can later replace this with real data)
+import ProductGrid from "../components/homeScreen/ProductList";
 
 export default function ProductBar() {
   const [search, setSearch] = useState("");
+  const scrollY = useRef(new Animated.Value(0)).current;
+
+  // Header animation (slide up)
+  const headerTranslate = scrollY.interpolate({
+    inputRange: [0, 100],
+    outputRange: [0, -100],
+    extrapolate: "clamp",
+  });
 
   return (
     <View style={styles.container}>
-
-      {/* Header Section */}
-      <View style={styles.headerSection}>
+      {/* Animated Header */}
+      <Animated.View
+        style={[
+          styles.headerSection,
+          { transform: [{ translateY: headerTranslate }] },
+        ]}
+      >
         <Heading />
         <SearchBar search={search} setSearch={setSearch} />
-      </View>
+      </Animated.View>
 
-      {/* Product List */}
-      <ProductGrid search={search} />
-      
+      {/* Animated Scroll */}
+      <Animated.ScrollView
+        contentContainerStyle={{
+          paddingTop: 200,   // header space
+          paddingBottom: 100 // BottomBar space
+        }}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: true }
+        )}
+        scrollEventThrottle={16}
+      >
+        <ProductGrid search={search} />
+      </Animated.ScrollView>
 
       {/* Bottom Navigation Bar */}
       <BottomBar />
@@ -30,23 +51,18 @@ export default function ProductBar() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
   headerSection: {
+    position: "absolute", // REQUIRED
+    top: 0,
+    left: 0,
+    right: 0,
     backgroundColor: "green",
     paddingHorizontal: 16,
     paddingBottom: 16,
-  },
-  item: {
-    fontSize: 18,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
-  },
-  noResult: {
-    textAlign: "center",
-    color: "gray",
-    marginTop: 20,
-    fontSize: 16,
+    zIndex: 10,
   },
 });

@@ -1,13 +1,15 @@
 // src/components/common/LanguageModal.js
 import React from "react";
 import { Modal, View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { useTranslation } from "react-i18next";
 
 export default function LanguageModal({ visible, onSelect }) {
+  const { t } = useTranslation();
   return (
     <Modal transparent visible={visible} animationType="fade">
       <View style={styles.overlay}>
         <View style={styles.container}>
-          <Text style={styles.title}>Select Language</Text>
+          <Text style={styles.title}>{t("profile.selectLanguage")}</Text>
 
           <TouchableOpacity
             style={styles.button}

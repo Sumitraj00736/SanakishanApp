@@ -9,13 +9,14 @@ import {
   Dimensions,
   TouchableOpacity,
 } from "react-native";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { ProductContext } from "../../context/ProductProvider";
 import ProductSkeleton from "../common/ProductSkeleton";
+import { useTranslation } from "react-i18next";
 
 const { width } = Dimensions.get("window");
 
 export default function ProductList({ search = "" }) {
+  const { t } = useTranslation();
   const navigation = useNavigation();
   const { products, fetchProducts, loading } = useContext(ProductContext);
 
@@ -53,7 +54,7 @@ export default function ProductList({ search = "" }) {
   if (!filteredProducts.length) {
     return (
       <View style={styles.center}>
-        <Text>No products found</Text>
+        <Text>{t("common.noProducts")}</Text>
       </View>
     );
   }
@@ -94,13 +95,7 @@ export default function ProductList({ search = "" }) {
           </Text>
 
           <View style={styles.priceTag}>
-            <MaterialCommunityIcons
-              name="currency-inr"
-              size={14}
-              color="#fff"
-              style={{ marginRight: 4 }}
-            />
-            <Text style={styles.priceText}>{item.basePrice}</Text>
+            <Text style={styles.priceText}>NPR {item.basePrice}</Text>
           </View>
         </TouchableOpacity>
       )}

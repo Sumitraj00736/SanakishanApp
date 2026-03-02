@@ -6,15 +6,17 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  Alert,
   ActivityIndicator,
 } from "react-native";
 
 import BottomBar from "../components/navigation/BottomBar";
 import { ProductContext } from "../context/ProductProvider";
+import { useTranslation } from "react-i18next";
+import Toast from "react-native-toast-message";
 
 export default function SupportScreen() {
-  const { createSupportTicket } = useContext(ProductContext);
+  const { t } = useTranslation();
+  const { createSupportTicket, setGuestPhone } = useContext(ProductContext);
 
   const [form, setForm] = useState({
     name: "",
@@ -35,13 +37,13 @@ export default function SupportScreen() {
     // ✅ Validation
    switch (true) {
     case !name:
-      Alert.alert("Error", "Name field is required");
+      Toast.show({ type: "error", text1: t("common.error"), text2: t("support.nameRequired") });
       return;
     case !phone:
-      Alert.alert("Error", "Phone field is required");
+      Toast.show({ type: "error", text1: t("common.error"), text2: t("support.phoneRequired") });
       return;
     case phone.length < 10:
-      Alert.alert("Error", "Enter a valid phone number");
+      Toast.show({ type: "error", text1: t("common.error"), text2: t("support.phoneInvalid") });
       return;
     default:
       break;
@@ -63,16 +65,17 @@ export default function SupportScreen() {
       message,
     };
 
+    await setGuestPhone(phone);
     const response = await createSupportTicket(payload);
 
     setLoading(false);
 
     if (!response.success) {
-      Alert.alert("Error", response.message);
+      Toast.show({ type: "error", text1: t("common.error"), text2: response.message });
       return;
     }
 
-    Alert.alert("Success", "Support ticket created successfully ✅");
+    Toast.show({ type: "success", text1: t("common.success"), text2: t("support.success") });
 
     // ✅ Clear form
     setForm({
@@ -88,9 +91,9 @@ export default function SupportScreen() {
     <ScrollView contentContainerStyle={styles.container}>
       {/* Header Section */}
       <View style={styles.header}>
-        <Text style={styles.heading}>Customer Support</Text>
+        <Text style={styles.heading}>{t("support.title")}</Text>
         <Text style={styles.subHeading}>
-          Fill out the form below, and our team will contact you shortly.
+          {t("support.subtitle")}
         </Text>
       </View>
 
@@ -106,7 +109,7 @@ export default function SupportScreen() {
 
         <TextInput
           style={styles.input}
-          placeholder="Full Name"
+          placeholder={t("support.fullName")}
           placeholderTextColor="#888"
           value={form.name}
           onChangeText={(text) => handleChange("name", text)}
@@ -114,7 +117,7 @@ export default function SupportScreen() {
 
         <TextInput
           style={styles.input}
-          placeholder="Phone Number"
+          placeholder={t("support.phone")}
           placeholderTextColor="#888"
           keyboardType="phone-pad"
           value={form.phone}
@@ -123,7 +126,7 @@ export default function SupportScreen() {
 
         <TextInput
           style={styles.input}
-          placeholder="Email Address"
+          placeholder={t("support.email")}
           placeholderTextColor="#888"
           keyboardType="email-address"
           autoCapitalize="none"
@@ -133,7 +136,7 @@ export default function SupportScreen() {
 
         <TextInput
           style={[styles.input, styles.textArea]}
-          placeholder="Describe your issue..."
+          placeholder={t("support.message")}
           placeholderTextColor="#888"
           multiline
           numberOfLines={4}
@@ -149,7 +152,7 @@ export default function SupportScreen() {
           {loading ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={styles.buttonText}>Submit Request</Text>
+            <Text style={styles.buttonText}>{t("support.submit")}</Text>
           )}
         </TouchableOpacity>
       </View>

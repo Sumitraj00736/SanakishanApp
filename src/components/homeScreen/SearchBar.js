@@ -2,8 +2,10 @@
 import React, { useRef, useState, useEffect } from "react";
 import { View, TextInput, StyleSheet, Animated } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 
 export default function SearchBar({ search, setSearch }) {
+  const { t } = useTranslation();
   const [isFocused, setIsFocused] = useState(false);
   const widthAnim = useRef(new Animated.Value(0)).current; // animation for border & shadow
 
@@ -40,7 +42,7 @@ export default function SearchBar({ search, setSearch }) {
       <Ionicons name="search-outline" size={20} color="#777" style={styles.icon} />
       <TextInput
         style={styles.input}
-        placeholder="Search equipment..."
+        placeholder={t("search.placeholder")}
         value={search}
         onChangeText={setSearch}
         onFocus={() => setIsFocused(true)}

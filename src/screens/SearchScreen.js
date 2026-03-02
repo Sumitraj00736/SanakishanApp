@@ -1,67 +1,68 @@
-import React, { useState } from "react";
-import { View, Text, FlatList, StyleSheet } from "react-native";
+import React, { useState, useRef } from "react";
+import { View, StyleSheet, Animated } from "react-native";
 import Heading from "../components/homeScreen/Heading";
 import SearchBar from "../components/homeScreen/SearchBar";
 import BottomBar from "../components/navigation/BottomBar";
-import ProductList from "../components/homeScreen/ProductList"
-
-// Sample product list (you can later replace this with real data)
-const products = [
-  // { id: 1, name: "Tractor" },
-  // { id: 2, name: "Plough" },
-  // { id: 3, name: "Harvester" },
-  // { id: 4, name: "Water Pump" },
-  // { id: 5, name: "Fertilizer Mixer" },
-  // { id: 6, name: "Seed Drill Machine" },
-  // { id: 7, name: "Sprayer" },
-  // { id: 8, name: "Irrigation Motor" },
-  // { id: 9, name: "Mini Tractor" },
-  // { id: 10, name: "Rotavator" },
-];
+import ProductList from "../components/homeScreen/ProductList";
 
 export default function SearchScreen() {
   const [search, setSearch] = useState("");
+  const scrollY = useRef(new Animated.Value(0)).current;
 
-  // Filter products based on search input
-  const filteredProducts = products.filter((item) =>
-    item.name.toLowerCase().includes(search.toLowerCase())
-  );
+  // Header animation (slide up)
+  const headerTranslate = scrollY.interpolate({
+    inputRange: [0, 100],
+    outputRange: [0, -100],
+    extrapolate: "clamp",
+  });
 
   return (
     <View style={styles.container}>
-      {/* Header Section */}
-      <View style={styles.headerSection}>
+      {/* Animated Header */}
+      <Animated.View
+        style={[
+          styles.headerSection,
+          { transform: [{ translateY: headerTranslate }] },
+        ]}
+      >
         <Heading />
         <SearchBar search={search} setSearch={setSearch} />
-      </View>
+      </Animated.View>
 
-      {/* Product List */}
-      <ProductList search={search} />
+      {/* Animated Scroll */}
+      <Animated.ScrollView
+        contentContainerStyle={{
+          paddingTop: 200, // space for header
+          paddingBottom: 100, // space for BottomBar
+        }}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: true }
+        )}
+        scrollEventThrottle={16}
+      >
+        <ProductList search={search} />
+      </Animated.ScrollView>
 
-      {/* Bottom Navigation Bar */}
+      {/* Bottom Bar */}
       <BottomBar />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
   headerSection: {
+    position: "absolute", // IMPORTANT
+    top: 0,
+    left: 0,
+    right: 0,
     backgroundColor: "green",
     paddingHorizontal: 16,
     paddingBottom: 16,
-  },
-  item: {
-    fontSize: 18,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
-  },
-  noResult: {
-    textAlign: "center",
-    color: "gray",
-    marginTop: 20,
-    fontSize: 16,
+    zIndex: 10,
   },
 });

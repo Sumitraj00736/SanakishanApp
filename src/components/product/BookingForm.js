@@ -5,16 +5,18 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Alert,
   Animated,
 } from "react-native";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { ProductContext } from "../../context/ProductProvider";
 import { AuthContext } from "../../context/AuthProvider";
+import { useTranslation } from "react-i18next";
+import Toast from "react-native-toast-message";
 
 
 export default function BookingForm() {
-  const { productDetail, bookProduct } = useContext(ProductContext);
+  const { t } = useTranslation();
+  const { productDetail, bookProduct, setGuestPhone } = useContext(ProductContext);
   const { user } = useContext(AuthContext);
   
 
@@ -28,6 +30,8 @@ export default function BookingForm() {
   const [showEndPicker, setShowEndPicker] = useState(false);
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const isUnavailable =
+    productDetail?.status === "booked" || Number(productDetail?.reservedUnits || 0) <= 0;
 
   useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -39,12 +43,12 @@ export default function BookingForm() {
 
   const handleBooking = async () => {
     if (!name || !phone || !quantity) {
-      Alert.alert("Error", "Please fill all required fields");
+      Toast.show({ type: "error", text1: t("common.error"), text2: t("booking.requiredFields") });
       return;
     }
 
     if (!productDetail) {
-      Alert.alert("Error", "Product details not loaded yet");
+      Toast.show({ type: "error", text1: t("common.error"), text2: t("booking.productNotLoaded") });
       return;
     }
 
@@ -58,60 +62,62 @@ export default function BookingForm() {
       userEmail: email,
     };
 
+    await setGuestPhone(phone);
     const res = await bookProduct(bookingData);
 
     if (res.success) {
-      Alert.alert(
-        "Booking Confirmed",
-        `Product: ${productDetail.name}\nName: ${name}\nQuantity: ${quantity}\nStart: ${startDateTime.toLocaleString()}\nEnd: ${endDateTime.toLocaleString()}`
-      );
+      Toast.show({
+        type: "success",
+        text1: t("booking.confirmed"),
+        text2: `${productDetail.name} | Qty ${quantity}`,
+      });
       setQuantity("1");
       setStartDateTime(new Date());
       setEndDateTime(new Date());
     } else {
-      Alert.alert("Booking Failed", res.message);
+      Toast.show({ type: "error", text1: t("booking.failed"), text2: res.message });
     }
   };
 
   return (
     <Animated.View style={[styles.formContainer, { opacity: fadeAnim }]}>
-      <Text style={styles.formLabel}>Your Name</Text>
+      <Text style={styles.formLabel}>{t("booking.name")}</Text>
       <TextInput
         style={styles.input}
         value={name}
         onChangeText={setName}
-        placeholder="Enter your name"
+        placeholder={t("booking.namePlaceholder")}
       />
 
-      <Text style={styles.formLabel}>Phone Number</Text>
+      <Text style={styles.formLabel}>{t("booking.phone")}</Text>
       <TextInput
         style={styles.input}
         value={phone}
         onChangeText={setPhone}
-        placeholder="Enter your phone number"
+        placeholder={t("booking.phonePlaceholder")}
         keyboardType="phone-pad"
       />
 
-      <Text style={styles.formLabel}>Email</Text>
+      <Text style={styles.formLabel}>{t("booking.email")}</Text>
       <TextInput
         style={styles.input}
         value={email}
         onChangeText={setEmail}
-        placeholder="Enter your email"
+        placeholder={t("booking.emailPlaceholder")}
         keyboardType="email-address"
       />
 
-      <Text style={styles.formLabel}>Quantity</Text>
+      <Text style={styles.formLabel}>{t("booking.quantity")}</Text>
       <TextInput
         style={styles.input}
         value={quantity}
         onChangeText={setQuantity}
-        placeholder="Enter quantity"
+        placeholder={t("booking.quantity")}
         keyboardType="numeric"
       />
 
       {/* Start Date */}
-      <Text style={styles.formLabel}>Start Date & Time</Text>
+      <Text style={styles.formLabel}>{t("booking.startDate")}</Text>
       <TouchableOpacity
         style={styles.dateButton}
         onPress={() => setShowStartPicker(true)}
@@ -130,7 +136,7 @@ export default function BookingForm() {
       />
 
       {/* End Date */}
-      <Text style={styles.formLabel}>End Date & Time</Text>
+      <Text style={styles.formLabel}>{t("booking.endDate")}</Text>
       <TouchableOpacity
         style={styles.dateButton}
         onPress={() => setShowEndPicker(true)}
@@ -148,8 +154,17 @@ export default function BookingForm() {
         onCancel={() => setShowEndPicker(false)}
       />
 
-      <TouchableOpacity style={styles.bookButton} onPress={handleBooking}>
-        <Text style={styles.bookButtonText}>Book Now</Text>
+      {isUnavailable && (
+        <Text style={styles.unavailableText}>Currently not available</Text>
+      )}
+      <TouchableOpacity
+        style={[styles.bookButton, isUnavailable && styles.bookButtonDisabled]}
+        onPress={handleBooking}
+        disabled={isUnavailable}
+      >
+        <Text style={styles.bookButtonText}>
+          {isUnavailable ? "Booked" : t("booking.bookNow")}
+        </Text>
       </TouchableOpacity>
     </Animated.View>
   );
@@ -188,5 +203,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 30,
   },
+  bookButtonDisabled: {
+    backgroundColor: "#94a3b8",
+  },
   bookButtonText: { color: "#fff", fontSize: 18, fontWeight: "bold" },
+  unavailableText: { marginBottom: 10, color: "#dc2626", fontWeight: "700", textAlign: "center" },
 });
