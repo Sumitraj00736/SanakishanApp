@@ -1,16 +1,14 @@
 import React, { useRef, useEffect } from "react";
-import { View, StyleSheet, Animated, Dimensions } from "react-native";
+import { View, StyleSheet, Animated, useWindowDimensions } from "react-native";
 
-const { width } = Dimensions.get("window");
-
-const numColumns = 3;
 const ITEM_MARGIN = 10;
 const HORIZONTAL_PADDING = 16;
-const itemWidth =
-  (width - HORIZONTAL_PADDING * 2 - ITEM_MARGIN * (numColumns - 1)) /
-  numColumns;
 
-export default function ProductSkeleton({ index }) {
+export default function ProductSkeleton({ index, numColumns = 3 }) {
+  const { width } = useWindowDimensions();
+  const itemWidth =
+    (width - HORIZONTAL_PADDING * 2 - ITEM_MARGIN * (numColumns - 1)) /
+    numColumns;
   const shimmerAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {

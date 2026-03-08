@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   container: {
-    backgroundColor: "#fff",
+    backgroundColor: "#f0fdf4",
     padding: 24,
     borderRadius: 10,
     width: "80%",
@@ -48,11 +48,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
     marginBottom: 16,
+    color: "#14532d",
   },
   button: {
     padding: 14,
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: "#86efac",
+    backgroundColor: "#ffffff",
     borderRadius: 6,
     marginTop: 10,
     width: "100%",

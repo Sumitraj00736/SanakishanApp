@@ -1,4 +1,5 @@
 import React, { createContext, useCallback, useEffect, useMemo, useState } from "react";
+import { Vibration } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { io } from "socket.io-client";
 import Toast from "react-native-toast-message";
@@ -24,6 +25,7 @@ export const ProductProvider = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [guestPhone, setGuestPhoneState] = useState("");
+  const lastAlertAtRef = React.useRef(0);
 
   useEffect(() => {
     (async () => {
@@ -42,19 +44,28 @@ export const ProductProvider = ({ children }) => {
     }
   }, []);
 
+  const triggerDeviceAlert = useCallback(() => {
+    const now = Date.now();
+    // Avoid duplicate vibration bursts from multiple socket handlers firing at once.
+    if (now - lastAlertAtRef.current < 400) return;
+    lastAlertAtRef.current = now;
+    Vibration.vibrate(220);
+  }, []);
+
   const pushNotification = useCallback(async (item) => {
     setNotifications((prev) => {
       const next = [{ ...item, _id: item?._id || `${Date.now()}-${Math.random()}` }, ...prev].slice(0, 100);
       return next;
     });
     setUnreadNotifications((prev) => prev + 1);
+    triggerDeviceAlert();
     Toast.show({
       type: "success",
       text1: item.title,
       text2: item.message,
       visibilityTime: 3000,
     });
-  }, []);
+  }, [triggerDeviceAlert]);
 
   const fetchNotifications = useCallback(async () => {
     try {
@@ -149,6 +160,7 @@ export const ProductProvider = ({ children }) => {
       if (payload?.notification) {
         setNotifications((prev) => [payload.notification, ...prev].slice(0, 100));
         setUnreadNotifications((prev) => prev + 1);
+        triggerDeviceAlert();
         Toast.show({
           type: "success",
           text1: payload?.status === "confirmed" ? "Booking Confirmed" : "Booking Update",
@@ -169,6 +181,7 @@ export const ProductProvider = ({ children }) => {
       if (payload?.notification) {
         setNotifications((prev) => [payload.notification, ...prev].slice(0, 100));
         setUnreadNotifications((prev) => prev + 1);
+        triggerDeviceAlert();
         Toast.show({
           type: "success",
           text1: "Support Notification",
@@ -186,7 +199,7 @@ export const ProductProvider = ({ children }) => {
     });
 
     return () => socket.disconnect();
-  }, [guestPhone, pushNotification, user?.memberId]);
+  }, [guestPhone, pushNotification, triggerDeviceAlert, user?.memberId]);
 
   const fetchProducts = useCallback(async () => {
     try {

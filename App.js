@@ -13,6 +13,7 @@ import ProductBar from "./src/screens/ProductBar";
 import SupportScreen from "./src/screens/SupportScreen";
 import ProfileScreen from "./src/screens/ProfileScreen";
 import NotificationsScreen from "./src/screens/NotificationsScreen";
+import AuthGateScreen from "./src/screens/AuthGateScreen";
 import { ProductProvider } from "./src/context/ProductProvider";
 import { AuthProvider, AuthContext } from "./src/context/AuthProvider";
 import Toast from "react-native-toast-message";
@@ -20,7 +21,8 @@ import Toast from "react-native-toast-message";
 const Stack = createStackNavigator();
 
 function AppNavigator() {
-  const { hydrating } = useContext(AuthContext);
+  const { hydrating, user } = useContext(AuthContext);
+  const [guestAllowed, setGuestAllowed] = React.useState(false);
 
   if (hydrating) {
     return (
@@ -33,6 +35,11 @@ function AppNavigator() {
   return (
     <NavigationContainer>
       <Stack.Navigator>
+        {!user && !guestAllowed && (
+          <Stack.Screen name="AuthGate" options={{ headerShown: false }}>
+            {() => <AuthGateScreen onGuestContinue={() => setGuestAllowed(true)} />}
+          </Stack.Screen>
+        )}
         <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
         <Stack.Screen name="ProductDetail" component={ProductDetail} options={{ title: "Product Detail" }} />
         <Stack.Screen name="ProductScreen" component={ProductScreen} options={{ title: "Product Details" }} />

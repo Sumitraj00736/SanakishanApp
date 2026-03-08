@@ -1,11 +1,13 @@
 // src/components/homeScreen/SearchBar.js
 import React, { useRef, useState, useEffect } from "react";
-import { View, TextInput, StyleSheet, Animated } from "react-native";
+import { View, TextInput, StyleSheet, Animated, useWindowDimensions } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 
 export default function SearchBar({ search, setSearch }) {
   const { t } = useTranslation();
+  const { width } = useWindowDimensions();
+  const isSmall = width < 380;
   const [isFocused, setIsFocused] = useState(false);
   const widthAnim = useRef(new Animated.Value(0)).current; // animation for border & shadow
 
@@ -19,7 +21,7 @@ export default function SearchBar({ search, setSearch }) {
 
   const borderColor = widthAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: ["#ccc", "green"],
+    outputRange: ["#86efac", "#15803d"],
   });
 
   const shadowOpacity = widthAnim.interpolate({
@@ -32,6 +34,11 @@ export default function SearchBar({ search, setSearch }) {
       style={[
         styles.container,
         {
+          borderRadius: isSmall ? 10 : 12,
+          marginTop: isSmall ? 6 : 8,
+          marginBottom: isSmall ? 10 : 14,
+        },
+        {
           borderColor,
           shadowOpacity,
           shadowRadius: isFocused ? 4 : 2,
@@ -39,7 +46,7 @@ export default function SearchBar({ search, setSearch }) {
         },
       ]}
     >
-      <Ionicons name="search-outline" size={20} color="#777" style={styles.icon} />
+      <Ionicons name="search-outline" size={20} color="#166534" style={styles.icon} />
       <TextInput
         style={styles.input}
         placeholder={t("search.placeholder")}
@@ -57,13 +64,10 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "white",
+    backgroundColor: "#f0fdf4",
     borderWidth: 1,
-    borderRadius: 8,
     paddingHorizontal: 10,
-    marginBottom: 16,
-    marginTop: 12,
-    shadowColor: "#000",
+    shadowColor: "#14532d",
     shadowOpacity: 0,
     shadowOffset: { width: 0, height: 1 },
     shadowRadius: 2,
@@ -74,6 +78,7 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    height: 40,
+    height: 38,
+    color: "#14532d",
   },
 });

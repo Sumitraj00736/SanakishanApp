@@ -6,19 +6,18 @@ import {
   Text,
   Image,
   StyleSheet,
-  Dimensions,
+  useWindowDimensions,
   TouchableOpacity,
 } from "react-native";
 import { ProductContext } from "../../context/ProductProvider";
 import ProductSkeleton from "../common/ProductSkeleton";
 import { useTranslation } from "react-i18next";
 
-const { width } = Dimensions.get("window");
-
-export default function ProductList({ search = "" }) {
+export default function ProductList({ search = "", topPadding = 16 }) {
   const { t } = useTranslation();
   const navigation = useNavigation();
   const { products, fetchProducts, loading } = useContext(ProductContext);
+  const { width } = useWindowDimensions();
 
   useEffect(() => {
     fetchProducts();
@@ -28,7 +27,7 @@ export default function ProductList({ search = "" }) {
     product.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  const numColumns = 3;
+  const numColumns = width < 380 ? 2 : 3;
   const ITEM_MARGIN = 10;
   const HORIZONTAL_PADDING = 16;
 
@@ -44,9 +43,10 @@ export default function ProductList({ search = "" }) {
         data={Array.from({ length: 6 })}
         keyExtractor={(_, index) => index.toString()}
         numColumns={numColumns}
-        contentContainerStyle={{ padding: 16 }}
-        columnWrapperStyle={{ marginBottom: 16 }}
-        renderItem={({ index }) => <ProductSkeleton index={index} />}
+        key={numColumns}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingTop: topPadding, paddingBottom: 16 }}
+        columnWrapperStyle={{ marginBottom: 12 }}
+        renderItem={({ index }) => <ProductSkeleton index={index} numColumns={numColumns} />}
       />
     );
   }
@@ -66,8 +66,9 @@ export default function ProductList({ search = "" }) {
       data={filteredProducts}
       keyExtractor={(item) => item._id}
       numColumns={numColumns}
-      contentContainerStyle={{ padding: 16 }}
-      columnWrapperStyle={{ marginBottom: 16 }}
+      key={numColumns}
+      contentContainerStyle={{ paddingHorizontal: 16, paddingTop: topPadding, paddingBottom: 16 }}
+      columnWrapperStyle={{ marginBottom: 12 }}
       renderItem={({ item, index }) => (
         <TouchableOpacity
           activeOpacity={0.85}
@@ -85,17 +86,31 @@ export default function ProductList({ search = "" }) {
             },
           ]}
         >
-          <Image
-            source={{ uri: item.images?.[0] }}
-            style={styles.image}
-          />
+          <View style={styles.imageWrap}>
+            <Image
+              source={{ uri: item.images?.[0] || "https://via.placeholder.com/400x400" }}
+              style={styles.image}
+            />
+            <TouchableOpacity style={styles.favoriteBtn} activeOpacity={0.8}>
+              <Text style={styles.favoriteText}>♡</Text>
+            </TouchableOpacity>
+            <View style={styles.dotRow}>
+              <View style={[styles.dot, styles.dotActive]} />
+              <View style={styles.dot} />
+              <View style={styles.dot} />
+            </View>
+          </View>
 
-          <Text style={styles.name} numberOfLines={1}>
-            {item.name}
-          </Text>
-
-          <View style={styles.priceTag}>
-            <Text style={styles.priceText}>NPR {item.basePrice}</Text>
+          <View style={styles.infoRow}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.name} numberOfLines={1}>
+                {item.name}
+              </Text>
+              <Text style={styles.priceText}>Rs. {item.basePrice}</Text>
+            </View>
+            <View style={styles.arrowBtn}>
+              <Text style={styles.arrowText}>↗</Text>
+            </View>
           </View>
         </TouchableOpacity>
       )}
@@ -105,50 +120,98 @@ export default function ProductList({ search = "" }) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    alignItems: "center",
-    padding: 10,
+    backgroundColor: "#ffffff",
+    borderRadius: 16,
+    padding: 6,
+    borderWidth: 1,
+    borderColor: "#bbf7d0",
     shadowColor: "#000",
     shadowOpacity: 0.12,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 4,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 5,
   },
-
+  imageWrap: {
+    width: "100%",
+    borderRadius: 12,
+    overflow: "hidden",
+    backgroundColor: "#f1f5f9",
+    position: "relative",
+  },
   image: {
     width: "100%",
     aspectRatio: 1,
+    backgroundColor: "#e5e7eb",
+  },
+  favoriteBtn: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+    width: 24,
+    height: 24,
     borderRadius: 12,
-    marginBottom: 10,
-    backgroundColor: "#f1f1f1",
-  },
-
-  name: {
-    fontSize: 13,
-    fontWeight: "600",
-    textAlign: "center",
-    marginBottom: 6,
-    color: "#333",
-  },
-
-  priceTag: {
-    flexDirection: "row",
+    backgroundColor: "rgba(20, 83, 45, 0.45)",
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    backgroundColor: "#27ae60",
-    borderRadius: 20,
-    marginTop: 4,
   },
-
-  priceText: {
+  favoriteText: {
     color: "#fff",
-    fontSize: 12,
-    fontWeight: "bold",
+    fontSize: 14,
+    lineHeight: 16,
   },
-
+  dotRow: {
+    position: "absolute",
+    bottom: 8,
+    left: 0,
+    right: 0,
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 4,
+  },
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: "rgba(255,255,255,0.55)",
+  },
+  dotActive: {
+    backgroundColor: "#ffffff",
+  },
+  infoRow: {
+    marginTop: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 4,
+    paddingBottom: 2,
+    gap: 6,
+  },
+  name: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#14532d",
+    marginBottom: 1,
+  },
+  priceText: {
+    color: "#16a34a",
+    fontSize: 14,
+    fontWeight: "800",
+  },
+  arrowBtn: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: "#f0fdf4",
+    borderWidth: 1,
+    borderColor: "#bbf7d0",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  arrowText: {
+    color: "#14532d",
+    fontSize: 15,
+    fontWeight: "800",
+  },
   center: {
     flex: 1,
     justifyContent: "center",

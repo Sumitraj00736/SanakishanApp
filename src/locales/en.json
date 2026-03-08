@@ -23,11 +23,33 @@
   "search": {
     "placeholder": "Search equipment..."
   },
+  "slider": {
+    "slide1Title": "ShanaKishan Rentals",
+    "slide1Subtitle": "Reliable tools and machinery",
+    "slide2Title": "Smart Farming Solutions",
+    "slide2Subtitle": "Modern machines for better output",
+    "slide3Title": "We Are Here To Support You",
+    "slide3Subtitle": "Helping farmers with fast field support",
+    "slide4Title": "Farmer Help Network",
+    "slide4Subtitle": "Timely assistance for every booking"
+  },
   "auth": {
     "memberId": "Member ID",
     "enterMemberId": "Please enter Member ID",
     "loginSuccess": "Login successful!",
-    "loginFailed": "Login failed"
+    "loginFailed": "Login failed",
+    "invalidMemberId": "Invalid member ID"
+  },
+  "authGate": {
+    "title": "Go ahead and set up your account",
+    "subtitle": "Login with member ID or continue as guest",
+    "loginTab": "Login",
+    "guestTab": "Guest",
+    "memberIdPlaceholder": "Enter member ID",
+    "wait": "Please wait...",
+    "or": "or",
+    "continueAsGuest": "Continue as Guest",
+    "memberLoginSuccess": "Member login successful"
   },
   "product": {
     "price": "Price"
@@ -37,6 +59,8 @@
     "productNotLoaded": "Product details not loaded yet",
     "confirmed": "Booking Confirmed",
     "failed": "Booking Failed",
+    "unavailable": "Currently not available",
+    "booked": "Booked",
     "name": "Your Name",
     "namePlaceholder": "Enter your name",
     "phone": "Phone Number",
@@ -47,6 +71,21 @@
     "startDate": "Start Date & Time",
     "endDate": "End Date & Time",
     "bookNow": "Book Now"
+  },
+  "bookingCalendar": {
+    "title": "Booking Calendar (BS)",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "startTime": "Start Time",
+    "endTime": "End Time",
+    "timePlaceholder": "HH:MM",
+    "cancel": "Cancel",
+    "apply": "Apply",
+    "bsSuffix": "BS",
+    "timeFormatHint": "Enter time as HH:MM (12-hour)",
+    "convertError": "Could not convert selected BS date",
+    "endAfterStart": "End date/time must be after start date/time",
+    "bsUnsupported": "Official BS calendar mapping is not fully supported on this device."
   },
   "support": {
     "title": "Customer Support",

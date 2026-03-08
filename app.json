@@ -2,7 +2,7 @@
   "expo": {
     "name": "ShanaKishan",
     "slug": "ShanakishanApp",
-    "version": "1.2.0",
+    "version": "1.4.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -27,8 +27,8 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.sumitraj00736.shanakishanapp",
-      "versionCode": 1
+      "package": "com.sumitraj00736.ShanakishanApp",
+      "versionCode": 17
     },
     "web": {
       "favicon": "./assets/favicon.png"

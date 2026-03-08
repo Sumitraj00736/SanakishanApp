@@ -53,14 +53,14 @@ export default function ProductBar() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#052e16",
   },
   headerSection: {
     position: "absolute", // REQUIRED
     top: 0,
     left: 0,
     right: 0,
-    backgroundColor: "green",
+    backgroundColor: "#052e16",
     paddingHorizontal: 16,
     paddingBottom: 16,
     zIndex: 10,

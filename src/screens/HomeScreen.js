@@ -1,4 +1,4 @@
-import React, { useState, useContext, useRef } from "react";
+import React, { useState, useContext } from "react";
 import {
   View,
   Text,
@@ -8,7 +8,8 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
-  Animated,
+  useWindowDimensions,
+  ScrollView,
 } from "react-native";
 
 import Heading from "../components/homeScreen/Heading";
@@ -19,15 +20,13 @@ import ProductGrid from "../components/homeScreen/ProductList";
 import BottomBar from "../components/navigation/BottomBar";
 import { AuthContext } from "../context/AuthProvider";
 import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { useNavigation } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
 
-
-const SLIDER_HEIGHT = 200;
-const CATEGORY_HEIGHT = 150;
-
 export default function HomeScreen() {
+  const { width, height } = useWindowDimensions();
   const navigation = useNavigation();
   const { t } = useTranslation();
   const [search, setSearch] = useState("");
@@ -36,19 +35,19 @@ export default function HomeScreen() {
 
   const { login } = useContext(AuthContext);
 
-  const scrollY = useRef(new Animated.Value(0)).current;
-  const scrollClamped = Animated.diffClamp(scrollY, 0, SLIDER_HEIGHT);
+  const isSmall = width < 380 || height < 700;
+  const widthScale = Math.min(Math.max(width / 390, 0.92), 1.12);
+  const heightScale = Math.min(Math.max(height / 844, 0.9), 1.12);
+  const scaleValue = (value) => Math.round(value * ((widthScale + heightScale) / 2));
 
-  const sliderTranslateY = scrollClamped.interpolate({
-    inputRange: [0, SLIDER_HEIGHT],
-    outputRange: [0, -SLIDER_HEIGHT],
-  });
-
-  const stickyCategoryOpacity = scrollClamped.interpolate({
-    inputRange: [SLIDER_HEIGHT - 20, SLIDER_HEIGHT],
-    outputRange: [0, 1],
-    extrapolate: "clamp",
-  });
+  const horizontalPad = scaleValue(isSmall ? 12 : 16);
+  const headerTopPad = scaleValue(isSmall ? 38 : 50);
+  const SLIDER_HEIGHT = scaleValue(isSmall ? 164 : 190);
+  const CATEGORY_HEIGHT = scaleValue(isSmall ? 108 : 124);
+  const STICKY_TOP = scaleValue(isSmall ? 86 : 102);
+  const categoryTopGap = scaleValue(isSmall ? 6 : 8);
+  const productsTitleTop = scaleValue(isSmall ? 10 : 14);
+  const productsTopPadding = scaleValue(isSmall ? 8 : 10);
 
   const handleMemberSave = async () => {
     if (!memberId) {
@@ -68,7 +67,7 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       {/* FIXED HEADER */}
-      <View style={styles.fixedHeader}>
+      <View style={[styles.fixedHeader, { paddingTop: headerTopPad, paddingHorizontal: horizontalPad }]}>
         <Heading
           onMemberPress={() => setMemberModalVisible(true)}
           onProfilePress={() => navigation.navigate("Profile")}
@@ -76,45 +75,29 @@ export default function HomeScreen() {
         <SearchBar search={search} setSearch={setSearch} />
       </View>
 
-      {/* STICKY CATEGORY (appears after slider collapses) */}
-      <Animated.View
-        style={[styles.stickyCategory, { opacity: stickyCategoryOpacity }]}
-        pointerEvents="box-none"
-      >
-        <Category />
-      </Animated.View>
-
-      {/* SCROLL CONTENT */}
-      <Animated.ScrollView
-        style={{ flex: 1 }}
+      <ScrollView
+        style={styles.scrollRoot}
         contentContainerStyle={{
-          paddingTop: SLIDER_HEIGHT + CATEGORY_HEIGHT, 
-          paddingBottom: 120,
-          backgroundColor: "green",
+          paddingBottom: isSmall ? 96 : 118,
+          backgroundColor: "#052e16",
         }}
-        scrollEventThrottle={30}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: true }
-        )}
       >
-        {/* SLIDER + SCROLLABLE CATEGORY */}
-        <Animated.View
-          style={[
-            styles.sliderWrapper,
-            { transform: [{ translateY: sliderTranslateY }] },
-          ]}
-        >
+        <View style={[styles.sliderSection, { paddingHorizontal: horizontalPad }]}>
           <Slider />
-          <Category />
-        </Animated.View>
+          <Category containerStyle={{ marginTop: categoryTopGap }} />
+        </View>
 
         {/* PRODUCTS */}
-        <View style={{ zIndex: 0 }}>
-          <Text style={styles.productsLabel}>{t("common.products")}</Text>
-          <ProductGrid search={search} />
+        <View style={{ marginTop: productsTitleTop }}>
+          <View style={[styles.productsHeaderRow, { paddingHorizontal: horizontalPad }]}>
+            <View style={styles.productsIconBubble}>
+              <MaterialCommunityIcons name="package-variant-closed" size={15} color="#14532d" />
+            </View>
+            <Text style={[styles.productsLabel, { fontSize: scaleValue(isSmall ? 16 : 18) }]}>{t("common.products")}</Text>
+          </View>
+          <ProductGrid search={search} topPadding={productsTopPadding} />
         </View>
-      </Animated.ScrollView>
+      </ScrollView>
 
       {/* MODAL */}
       <Modal visible={memberModalVisible} transparent animationType="fade">
@@ -122,7 +105,7 @@ export default function HomeScreen() {
           style={styles.modalOverlay}
           behavior={Platform.OS === "ios" ? "padding" : undefined}
         >
-          <View style={styles.modalContainer}>
+          <View style={[styles.modalContainer, { width: width < 380 ? "94%" : "86%" }]}>
             {/* Close (Cross) Button */}
             <TouchableOpacity
               style={styles.closeButton}
@@ -156,42 +139,38 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { flex: 1, backgroundColor: "#052e16" },
 
   fixedHeader: {
-    backgroundColor: "green",
-    paddingTop: 16,
-    paddingHorizontal: 16,
+    backgroundColor: "#052e16",
     zIndex: 100,
   },
 
-  sliderWrapper: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: "green",
-    zIndex: 1,
-    paddingHorizontal: 16,
+  scrollRoot: {
+    flex: 1,
   },
-
-  stickyCategory: {
-    position: "absolute",
-    top: 80, // below header
-    left: 0,
-    right: 0,
-    height: CATEGORY_HEIGHT,
-    backgroundColor: "green",
-    zIndex: 2,
-    paddingHorizontal: 16,
+  sliderSection: {
+    backgroundColor: "#052e16",
+    paddingTop: 10,
+  },
+  productsHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 2,
+  },
+  productsIconBubble: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: "#bbf7d0",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 8,
   },
 
   productsLabel: {
-    fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: "800",
     color: "#fff",
-    marginLeft: 16,
-    marginTop: 16,
   },
 
   modalOverlay: {
@@ -201,8 +180,8 @@ const styles = StyleSheet.create({
   },
 
   modalContainer: {
-    backgroundColor: "#fff",
-    margin: 20,
+    backgroundColor: "#f0fdf4",
+    alignSelf: "center",
     padding: 16,
     borderRadius: 10,
   },
@@ -211,18 +190,20 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 12,
+    color: "#14532d",
   },
 
   memberInput: {
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: "#86efac",
     borderRadius: 8,
     padding: 10,
     marginBottom: 12,
+    backgroundColor: "#ffffff",
   },
 
   saveButton: {
-    backgroundColor: "green",
+    backgroundColor: "#15803d",
     padding: 12,
     borderRadius: 8,
     alignItems: "center",
