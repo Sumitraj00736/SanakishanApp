@@ -13,7 +13,9 @@ import {
   Platform,
   useWindowDimensions,
   Image,
+  SafeAreaView,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import BottomBar from "../components/navigation/BottomBar";
 import { ProductContext } from "../context/ProductProvider";
@@ -25,6 +27,7 @@ const KISHAN_HELP_POSTER =
   "https://images.unsplash.com/photo-1592982537447-7440770cbfc9?auto=format&fit=crop&w=1200&q=80";
 
 export default function SupportScreen() {
+  const insets = useSafeAreaInsets();
   const { height } = useWindowDimensions();
   const { t } = useTranslation();
   const { createSupportTicket, setGuestPhone } = useContext(ProductContext);
@@ -121,112 +124,181 @@ export default function SupportScreen() {
     });
   };
 
+  const contentMaxWidth = 780;
+  const BAR_HEIGHT = 88;
+
   return (
-    <View style={styles.container}>
-      <View style={styles.topArea}>
-        <View style={styles.helpGifOutline}>
-          <Image source={{ uri: KISHAN_HELP_POSTER }} style={styles.helpGif} resizeMode="cover" />
-          <View style={styles.helpGifOverlay}>
-            <MaterialCommunityIcons name="leaf-circle-outline" size={18} color="#16a34a" />
-            <Text style={styles.helpGifText}>We are here to support you</Text>
-          </View>
-        </View>
-        <Text style={[styles.topTitle, { fontSize: height < 700 ? 20 : 24 }]}>{t("support.title")}</Text>
-        <Text style={styles.topSubTitle}>{t("support.subtitle")}</Text>
-      </View>
-
-      <Animated.View style={[styles.sheetWrap, { transform: [{ translateY: slideAnim }], marginTop: height < 700 ? 4 : 8 }]}>
-        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={styles.sheetInner}>
-          <View style={styles.dragHandle} />
-          <View style={styles.iconCircle}>
-            <Text style={styles.iconGlyph}>?</Text>
-          </View>
-          <Text style={[styles.sheetTitle, { fontSize: height < 700 ? 24 : 30 }]}>{t("support.title")}</Text>
-          <Text style={styles.sheetSubTitle}>{t("support.subtitle")}</Text>
-
-          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.form}>
-            <Animated.View style={[styles.inputCard, { opacity: fieldAnims[0], transform: [{ translateY: fieldAnims[0].interpolate({ inputRange: [0, 1], outputRange: [12, 0] }) }] }]}>
-              <View style={styles.inputIconWrap}>
-                <MaterialCommunityIcons name="account-outline" size={18} color="#166534" />
+    <SafeAreaView style={styles.container}>
+      <View style={{ flex: 1 }}>
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={Platform.OS === "ios" ? insets.top + 16 : insets.bottom + BAR_HEIGHT}
+        >
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="interactive"
+          contentContainerStyle={{
+            paddingBottom: BAR_HEIGHT + 40 + insets.bottom,
+            paddingTop: 12,
+            backgroundColor: "#f0fdf4",
+          }}
+          style={{ flex: 1 }}
+        >
+            <View style={[styles.topArea, { paddingHorizontal: 16, maxWidth: contentMaxWidth, alignSelf: "center", width: "100%" }]}>
+              <View style={styles.helpGifOutline}>
+                <Image source={{ uri: KISHAN_HELP_POSTER }} style={styles.helpGif} resizeMode="cover" />
+                <View style={styles.helpGifOverlay}>
+                  <MaterialCommunityIcons name="leaf-circle-outline" size={18} color="#16a34a" />
+                  <Text style={styles.helpGifText}>We are here to support you</Text>
+                </View>
               </View>
-              <TextInput
-                style={styles.input}
-                placeholder={t("support.fullName")}
-                placeholderTextColor="#6b7280"
-                value={form.name}
-                onChangeText={(text) => handleChange("name", text)}
-              />
-            </Animated.View>
+              <Text style={[styles.topTitle, { fontSize: height < 700 ? 20 : 24 }]}>{t("support.title")}</Text>
+              <Text style={styles.topSubTitle}>{t("support.subtitle")}</Text>
+            </View>
 
-            <Animated.View style={[styles.inputCard, { opacity: fieldAnims[1], transform: [{ translateY: fieldAnims[1].interpolate({ inputRange: [0, 1], outputRange: [12, 0] }) }] }]}>
-              <View style={styles.inputIconWrap}>
-                <MaterialCommunityIcons name="phone-outline" size={18} color="#166534" />
-              </View>
-              <TextInput
-                style={styles.input}
-                placeholder={t("support.phone")}
-                placeholderTextColor="#6b7280"
-                keyboardType="phone-pad"
-                value={form.phone}
-                onChangeText={(text) => handleChange("phone", text)}
-              />
-            </Animated.View>
+            <Animated.View
+              style={[
+                styles.sheetWrap,
+                {
+                  transform: [{ translateY: slideAnim }],
+                  marginTop: height < 700 ? 4 : 8,
+                  maxWidth: contentMaxWidth + 40,
+                  alignSelf: "center",
+                  width: "100%",
+                },
+              ]}
+            >
+              <View style={[styles.sheetInner, { paddingHorizontal: 16 }]}>
+                <View style={styles.dragHandle} />
+                <View style={styles.iconCircle}>
+                  <Text style={styles.iconGlyph}>?</Text>
+                </View>
+                <Text style={[styles.sheetTitle, { fontSize: height < 700 ? 24 : 30 }]}>{t("support.title")}</Text>
+                <Text style={styles.sheetSubTitle}>{t("support.subtitle")}</Text>
 
-            <Animated.View style={[styles.inputCard, { opacity: fieldAnims[2], transform: [{ translateY: fieldAnims[2].interpolate({ inputRange: [0, 1], outputRange: [12, 0] }) }] }]}>
-              <View style={styles.inputIconWrap}>
-                <MaterialCommunityIcons name="email-outline" size={18} color="#166534" />
-              </View>
-              <TextInput
-                style={styles.input}
-                placeholder={t("support.email")}
-                placeholderTextColor="#6b7280"
-                keyboardType="email-address"
-                autoCapitalize="none"
-                value={form.email}
-                onChangeText={(text) => handleChange("email", text)}
-              />
-            </Animated.View>
-
-            <Animated.View style={[styles.inputCard, styles.messageCard, { opacity: fieldAnims[3], transform: [{ translateY: fieldAnims[3].interpolate({ inputRange: [0, 1], outputRange: [12, 0] }) }] }]}>
-              <View style={styles.inputIconWrap}>
-                <MaterialCommunityIcons name="message-text-outline" size={18} color="#166534" />
-              </View>
-              <TextInput
-                style={[styles.input, styles.textArea]}
-                placeholder={t("support.message")}
-                placeholderTextColor="#6b7280"
-                multiline
-                numberOfLines={4}
-                value={form.message}
-                onChangeText={(text) => handleChange("message", text)}
-              />
-            </Animated.View>
-
-            <Animated.View style={{ opacity: fieldAnims[4], transform: [{ translateY: fieldAnims[4].interpolate({ inputRange: [0, 1], outputRange: [12, 0] }) }] }}>
-              <TouchableOpacity style={styles.button} onPress={handleSubmit} disabled={loading}>
-                {loading ? (
-                  <ActivityIndicator color="#fff" />
-                ) : (
-                  <View style={styles.buttonInner}>
-                    <MaterialCommunityIcons name="send-outline" size={18} color="#fff" />
-                    <Text style={styles.buttonText}>{t("support.submit")}</Text>
+                <Animated.View
+                  style={[
+                    styles.inputCard,
+                    {
+                      opacity: fieldAnims[0],
+                      transform: [{ translateY: fieldAnims[0].interpolate({ inputRange: [0, 1], outputRange: [12, 0] }) }],
+                    },
+                  ]}
+                >
+                  <View style={styles.inputIconWrap}>
+                    <MaterialCommunityIcons name="account-outline" size={18} color="#166534" />
                   </View>
-                )}
-              </TouchableOpacity>
+                  <TextInput
+                    style={styles.input}
+                    placeholder={t("support.fullName")}
+                    placeholderTextColor="#6b7280"
+                    value={form.name}
+                    onChangeText={(text) => handleChange("name", text)}
+                  />
+                </Animated.View>
+
+                <Animated.View
+                  style={[
+                    styles.inputCard,
+                    {
+                      opacity: fieldAnims[1],
+                      transform: [{ translateY: fieldAnims[1].interpolate({ inputRange: [0, 1], outputRange: [12, 0] }) }],
+                    },
+                  ]}
+                >
+                  <View style={styles.inputIconWrap}>
+                    <MaterialCommunityIcons name="phone-outline" size={18} color="#166534" />
+                  </View>
+                  <TextInput
+                    style={styles.input}
+                    placeholder={t("support.phone")}
+                    placeholderTextColor="#6b7280"
+                    keyboardType="phone-pad"
+                    value={form.phone}
+                    onChangeText={(text) => handleChange("phone", text)}
+                  />
+                </Animated.View>
+
+                <Animated.View
+                  style={[
+                    styles.inputCard,
+                    {
+                      opacity: fieldAnims[2],
+                      transform: [{ translateY: fieldAnims[2].interpolate({ inputRange: [0, 1], outputRange: [12, 0] }) }],
+                    },
+                  ]}
+                >
+                  <View style={styles.inputIconWrap}>
+                    <MaterialCommunityIcons name="email-outline" size={18} color="#166534" />
+                  </View>
+                  <TextInput
+                    style={styles.input}
+                    placeholder={t("support.email")}
+                    placeholderTextColor="#6b7280"
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    value={form.email}
+                    onChangeText={(text) => handleChange("email", text)}
+                  />
+                </Animated.View>
+
+                <Animated.View
+                  style={[
+                    styles.inputCard,
+                    styles.messageCard,
+                    {
+                      opacity: fieldAnims[3],
+                      transform: [{ translateY: fieldAnims[3].interpolate({ inputRange: [0, 1], outputRange: [12, 0] }) }],
+                    },
+                  ]}
+                >
+                  <View style={styles.inputIconWrap}>
+                    <MaterialCommunityIcons name="message-text-outline" size={18} color="#166534" />
+                  </View>
+                  <TextInput
+                    style={[styles.input, styles.textArea]}
+                    placeholder={t("support.message")}
+                    placeholderTextColor="#6b7280"
+                    multiline
+                    numberOfLines={4}
+                    value={form.message}
+                    onChangeText={(text) => handleChange("message", text)}
+                  />
+                </Animated.View>
+
+                <Animated.View
+                  style={{
+                    opacity: fieldAnims[4],
+                    transform: [{ translateY: fieldAnims[4].interpolate({ inputRange: [0, 1], outputRange: [12, 0] }) }],
+                  }}
+                >
+                  <TouchableOpacity style={styles.button} onPress={handleSubmit} disabled={loading}>
+                    {loading ? (
+                      <ActivityIndicator color="#fff" />
+                    ) : (
+                      <View style={styles.buttonInner}>
+                        <MaterialCommunityIcons name="send-outline" size={18} color="#fff" />
+                        <Text style={styles.buttonText}>{t("support.submit")}</Text>
+                      </View>
+                    )}
+                  </TouchableOpacity>
+                </Animated.View>
+              </View>
             </Animated.View>
           </ScrollView>
         </KeyboardAvoidingView>
-      </Animated.View>
-
-      <BottomBar />
-    </View>
+        <BottomBar />
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#052e16",
+    backgroundColor: "#f0fdf4",
   },
   topArea: {
     paddingTop: 60,

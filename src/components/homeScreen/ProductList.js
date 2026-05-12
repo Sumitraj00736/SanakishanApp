@@ -18,6 +18,7 @@ export default function ProductList({ search = "", topPadding = 16 }) {
   const navigation = useNavigation();
   const { products, fetchProducts, loading } = useContext(ProductContext);
   const { width } = useWindowDimensions();
+  const isSmall = width < 360;
 
   useEffect(() => {
     fetchProducts();
@@ -27,13 +28,13 @@ export default function ProductList({ search = "", topPadding = 16 }) {
     product.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  const numColumns = width < 380 ? 2 : 3;
-  const ITEM_MARGIN = 10;
   const HORIZONTAL_PADDING = 16;
-
-  const itemWidth =
-    (width - HORIZONTAL_PADDING * 2 - ITEM_MARGIN * (numColumns - 1)) /
-    numColumns;
+  const ITEM_MARGIN = 10;
+  const MIN_CARD_WIDTH = 150;
+  const availableWidth = width - HORIZONTAL_PADDING * 2;
+  const computedCols = Math.floor(availableWidth / MIN_CARD_WIDTH);
+  const numColumns = Math.min(5, Math.max(3, computedCols || 3));
+  const itemWidth = (availableWidth - ITEM_MARGIN * (numColumns - 1)) / numColumns;
 
   /* -------------------- SKELETON LOADER -------------------- */
   if (loading) {
@@ -106,7 +107,7 @@ export default function ProductList({ search = "", topPadding = 16 }) {
               <Text style={styles.name} numberOfLines={1}>
                 {item.name}
               </Text>
-              <Text style={styles.priceText}>Rs. {item.basePrice}</Text>
+              <Text style={[styles.priceText, isSmall && styles.priceTextSmall]}>Rs. {item.basePrice}</Text>
             </View>
             <View style={styles.arrowBtn}>
               <Text style={styles.arrowText}>↗</Text>
@@ -133,7 +134,7 @@ const styles = StyleSheet.create({
   },
   imageWrap: {
     width: "100%",
-    borderRadius: 12,
+    borderRadius: 14,
     overflow: "hidden",
     backgroundColor: "#f1f5f9",
     position: "relative",
@@ -197,6 +198,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "800",
   },
+  priceTextSmall: { fontSize: 12 },
   arrowBtn: {
     width: 28,
     height: 28,

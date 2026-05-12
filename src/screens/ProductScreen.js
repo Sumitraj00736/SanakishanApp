@@ -10,7 +10,12 @@ export default function ProductScreen() {
   const productId = route.params?.productId;
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      keyboardShouldPersistTaps="handled"
+      keyboardDismissMode="on-drag"
+      contentContainerStyle={{ paddingBottom: 24 }}
+    >
       <ProductDetail productId={productId} />
       <BookingForm productId={productId} />
     </ScrollView>

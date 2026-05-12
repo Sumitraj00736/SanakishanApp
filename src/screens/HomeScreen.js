@@ -1,16 +1,6 @@
 import React, { useState, useContext } from "react";
-import {
-  View,
-  Text,
-  Modal,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
-  useWindowDimensions,
-  ScrollView,
-} from "react-native";
+import { View, Text, Modal, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import Heading from "../components/homeScreen/Heading";
 import Slider from "../components/homeScreen/Slider";
@@ -26,7 +16,6 @@ import { useNavigation } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
 
 export default function HomeScreen() {
-  const { width, height } = useWindowDimensions();
   const navigation = useNavigation();
   const { t } = useTranslation();
   const [search, setSearch] = useState("");
@@ -35,19 +24,12 @@ export default function HomeScreen() {
 
   const { login } = useContext(AuthContext);
 
-  const isSmall = width < 380 || height < 700;
-  const widthScale = Math.min(Math.max(width / 390, 0.92), 1.12);
-  const heightScale = Math.min(Math.max(height / 844, 0.9), 1.12);
-  const scaleValue = (value) => Math.round(value * ((widthScale + heightScale) / 2));
-
-  const horizontalPad = scaleValue(isSmall ? 12 : 16);
-  const headerTopPad = scaleValue(isSmall ? 38 : 50);
-  const SLIDER_HEIGHT = scaleValue(isSmall ? 164 : 190);
-  const CATEGORY_HEIGHT = scaleValue(isSmall ? 108 : 124);
-  const STICKY_TOP = scaleValue(isSmall ? 86 : 102);
-  const categoryTopGap = scaleValue(isSmall ? 6 : 8);
-  const productsTitleTop = scaleValue(isSmall ? 10 : 14);
-  const productsTopPadding = scaleValue(isSmall ? 8 : 10);
+  const horizontalPad = 16;
+  const headerTopPad = 12;
+  const categoryTopGap = 10;
+  const productsTitleTop = 12;
+  const productsTopPadding = 12;
+  const contentMaxWidth = 760;
 
   const handleMemberSave = async () => {
     if (!memberId) {
@@ -65,9 +47,20 @@ export default function HomeScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       {/* FIXED HEADER */}
-      <View style={[styles.fixedHeader, { paddingTop: headerTopPad, paddingHorizontal: horizontalPad }]}>
+      <View
+        style={[
+          styles.fixedHeader,
+          {
+            paddingTop: headerTopPad,
+            paddingHorizontal: horizontalPad,
+            maxWidth: contentMaxWidth,
+            alignSelf: "center",
+            width: "100%",
+          },
+        ]}
+      >
         <Heading
           onMemberPress={() => setMemberModalVisible(true)}
           onProfilePress={() => navigation.navigate("Profile")}
@@ -78,22 +71,27 @@ export default function HomeScreen() {
       <ScrollView
         style={styles.scrollRoot}
         contentContainerStyle={{
-          paddingBottom: isSmall ? 96 : 118,
+          paddingBottom: 118,
           backgroundColor: "#052e16",
         }}
       >
-        <View style={[styles.sliderSection, { paddingHorizontal: horizontalPad }]}>
+        <View
+          style={[
+            styles.sliderSection,
+            { paddingHorizontal: horizontalPad, maxWidth: contentMaxWidth, alignSelf: "center", width: "100%" },
+          ]}
+        >
           <Slider />
           <Category containerStyle={{ marginTop: categoryTopGap }} />
         </View>
 
         {/* PRODUCTS */}
-        <View style={{ marginTop: productsTitleTop }}>
+        <View style={{ marginTop: productsTitleTop, alignSelf: "center", width: "100%", maxWidth: contentMaxWidth }}>
           <View style={[styles.productsHeaderRow, { paddingHorizontal: horizontalPad }]}>
             <View style={styles.productsIconBubble}>
               <MaterialCommunityIcons name="package-variant-closed" size={15} color="#14532d" />
             </View>
-            <Text style={[styles.productsLabel, { fontSize: scaleValue(isSmall ? 16 : 18) }]}>{t("common.products")}</Text>
+            <Text style={[styles.productsLabel, { fontSize: 18 }]}>{t("common.products")}</Text>
           </View>
           <ProductGrid search={search} topPadding={productsTopPadding} />
         </View>
@@ -105,7 +103,7 @@ export default function HomeScreen() {
           style={styles.modalOverlay}
           behavior={Platform.OS === "ios" ? "padding" : undefined}
         >
-          <View style={[styles.modalContainer, { width: width < 380 ? "94%" : "86%" }]}>
+          <View style={[styles.modalContainer, { width: "90%", maxWidth: 420 }]}>
             {/* Close (Cross) Button */}
             <TouchableOpacity
               style={styles.closeButton}
@@ -134,7 +132,7 @@ export default function HomeScreen() {
       </Modal>
 
       <BottomBar />
-    </View>
+    </SafeAreaView>
   );
 }
 

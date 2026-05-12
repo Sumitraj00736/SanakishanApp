@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   useWindowDimensions,
   View,
+  Image,
 } from "react-native";
 import { AuthContext } from "../context/AuthProvider";
 import Toast from "react-native-toast-message";
@@ -61,8 +62,17 @@ export default function AuthGateScreen({ onGuestContinue }) {
         <Text style={styles.heroSub}>{t("authGate.subtitle")}</Text>
       </View>
 
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={styles.sheet}>
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.sheetContent}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 24 : 0}
+        style={styles.sheet}
+      >
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+          contentContainerStyle={styles.sheetContent}
+        >
         <View style={styles.tabWrap}>
           <View style={styles.tabActive}>
             <Text style={styles.tabActiveText}>{t("authGate.loginTab")}</Text>
@@ -96,6 +106,12 @@ export default function AuthGateScreen({ onGuestContinue }) {
         <TouchableOpacity style={styles.guestBtn} onPress={onGuestContinue}>
           <Text style={styles.guestBtnText}>{t("authGate.continueAsGuest")}</Text>
         </TouchableOpacity>
+
+        <View style={styles.brandWrap}>
+          <View style={styles.brandLogoSquare}>
+            <Image source={require("../../assets/icon.png")} style={styles.brandLogo} resizeMode="cover" />
+          </View>
+        </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </View>
@@ -180,4 +196,25 @@ const styles = StyleSheet.create({
     backgroundColor: "#f0fdf4",
   },
   guestBtnText: { color: "#14532d", fontWeight: "700", fontSize: 16, fontFamily: "Poppins" },
+  brandWrap: {
+    marginTop: 8,
+    marginBottom: 2,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  brandLogoSquare: {
+    width: 62,
+    height: 62,
+    borderRadius: 14,
+    borderWidth: 2,
+    borderColor: "#86efac",
+    backgroundColor: "#f0fdf4",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  brandLogo: {
+    width: 50,
+    height: 50,
+    borderRadius: 10,
+  },
 });
